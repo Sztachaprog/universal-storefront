@@ -1,0 +1,5 @@
+Running pytests with 'hidden room' which contains all my tools like pytest,python,requests,playwright:
+    poetry run pytest smoke_test.py -s
+
+Run Docker without logs
+    docker-compose up -d
