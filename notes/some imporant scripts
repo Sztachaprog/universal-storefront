@@ -1,0 +1,60 @@
+psycopg2.connect	
+    Funkcja inicjująca fizyczne połączenie z bazą.	
+    Wybranie numeru telefonu i czekanie, aż baza "podniesie słuchawkę".
+
+**connection_params	
+    Przekazuje cały Twój słownik (host, port, user) do funkcji.	
+    Zamiast mówić portierowi po kolei: imię, nazwisko, wiek – dajesz mu całą listę naraz.
+
+conn	
+    Obiekt połączenia (Connection). Reprezentuje sesję z bazą.	
+    To jest Twój aktywny "tunel" lub "linia telefoniczna". Jeśli conn padnie, wszystko inne przestaje działać.
+
+conn.cursor()	
+    Metoda, która tworzy obiekt kursora.	
+    Wysłanie do bazy Twojego osobistego "kuriera", który będzie tam biegał z listami.
+
+cursor	
+    Obiekt roboczy. To przez niego "rozmawiasz" z danymi.	
+    Twój kurier lub "wskaźnik" wewnątrz bazy danych.
+
+.execute()	
+    Metoda wysyłająca surowe zapytanie SQL.	
+    Wręczenie kurierowi listu z rozkazem: "Zbuduj tabelę" lub "Dodaj Bartka".
+
+conn.commit()	
+    Najważniejsze: Trwale zapisuje Twoje zmiany w bazie.	
+    Podpisanie dokumentu. Bez tego baza "zapomni" wszystko, co zrobił kursor po zamknięciu połączenia.
+
+cursor.fetchone()	
+    Pobiera dokładnie jeden (pierwszy) wiersz z wyniku zapytania.	
+    Poproszenie kuriera, żeby podał Ci pierwszy z brzegu dokument ze stosu, który przyniósł.
+
+
+1. Co jest czym? (Słowniczek precyzyjny)
+
+    psycopg2: To jest biblioteka (paczka kodu), którą zainstalowałeś przez Poetry. Ona zawiera w sobie wiele narzędzi.
+
+    connect: To jest funkcja (narzędzie) znajdująca się wewnątrz biblioteki psycopg2. Wywołujesz ją przez kropkę: psycopg2.connect().
+
+    conn: To Twoja zmienna. Przechowuje ona "otwarty tunel" (obiekt połączenia), który stworzyła funkcja connect.
+
+    (**connection_params): To Twoje dane logowania. Gwiazdki ** to "rozpakowywacz" – wyjmują dane ze słownika i wkładają je do funkcji connect.
+
+2. Zagadka Kursora (The Cursor Mystery)
+
+    conn.cursor(): To jest metoda (funkcja przypisana do połączenia).
+
+    cursor (zmienna): Wyobraź sobie, że conn to autostrada do bazy, a cursor to samochód dostawczy, który po niej jeździ. Sam conn (tunel) nie potrafi wysyłać zapytań SQL – potrzebuje do tego "robota", czyli właśnie kursora.
+
+    .execute(): To główna umiejętność kursora. On "wykonuje" (execute) polecenie SQL, które mu wpiszesz w nawiasie. Czy robi coś jeszcze? Tak, przygotowuje bazę na odebranie danych.
+    
+3. Zapisywanie i Pobieranie (commit i fetchone)
+
+    conn.commit(): To funkcja należąca do połączenia (conn). W bazach danych zmiany (jak INSERT) są tymczasowe. commit() to ostateczny podpis pod pracą kursora. Bez tego baza "wyrzuci do kosza" wszystko, co kursor tam wpisał.
+
+    user = cursor.fetchone():
+
+    user: Twoja zmienna, w której zapisujesz wynik.
+
+    fetchone(): To komenda dla kursora: "Przynieś mi jeden (one) wynik, który właśnie znalazłeś (fetch)". To jak wyjęcie jednej ryby z sieci, którą kursor zarzucił przez .execute("SELECT...").

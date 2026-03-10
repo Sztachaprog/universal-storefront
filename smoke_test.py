@@ -1,5 +1,6 @@
 import requests
 import pytest
+import test_db
 from playwright.sync_api import sync_playwright
 
 def test_environment_ready():
