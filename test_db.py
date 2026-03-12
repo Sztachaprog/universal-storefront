@@ -24,14 +24,20 @@ def test_db_connection():
 
         cursor.execute("""
             INSERT INTO users (username, is_premium) VALUES
-            ('Bartek', TRUE)
+            ('Bartsek', TRUE)
+            RETURNING id;
         """)    
 
+        new_user_id = cursor.fetchone()[0]
         conn.commit()
-        cursor.execute("SELECT * FROM users")
-        user = cursor.fetchone()
-        print("[CONFIRMED] Database operations successful!")
-        print(f"Retrieved user: {user}")
+        
+        cursor.execute("SELECT id, username, is_premium FROM users WHERE id = %s;", (new_user_id,))
+        extracted_user = cursor.fetchone()
+
+        # 3. Asercja - sprawdzamy czy imię się zgadza
+        assert extracted_user[1] == 'Bartsek', f"Błąd! Oczekiwano Bartsek, a jest {extracted_user[1]}"
+        
+        print(f"[DATA] Extracted user details: ID={extracted_user[0]}, Name={extracted_user[1]}")
 
         cursor.close()
         conn.close()
