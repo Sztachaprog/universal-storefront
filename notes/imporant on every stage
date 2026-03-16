@@ -3,3 +3,6 @@ Running pytests with 'hidden room' which contains all my tools like pytest,pytho
 
 Run Docker without logs
     docker-compose up -d
+
+docker-compose down -v
+    sposób na wyczyszczenie "starej pamięci" haseł w Postgresie.
