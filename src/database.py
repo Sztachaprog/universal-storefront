@@ -1,3 +1,6 @@
+import psycopg2
+from psycopg2 import OperationalError
+
 connection_params = {
     "host":"localhost",
     "port": "5433",
@@ -5,3 +8,17 @@ connection_params = {
     "user":"user",    
     "password":"password"
 }
+
+def get_db_connection():
+    try:
+        conn = psycopg2.connect(**connection_params)
+        print("[INFO] Database connection established successfully.")
+        return conn
+    except OperationalError as e:
+        print(f"[ERROR] Database connection failed: {e}")
+        return None
+def close_db_connection(conn, cursor=None):
+    if cursor:
+        cursor.close()
+    if conn:
+        conn.close()
