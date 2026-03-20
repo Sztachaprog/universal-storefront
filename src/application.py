@@ -8,15 +8,15 @@ def add_user(username, password_hash, email, is_premium=False):
         
     cursor = conn.cursor()
     try:
-        query = "INSERT INTO users (username, password_hash, email, is_premium) VALUES (%s, %s, %s, %s) RETURNING id;"
+        query = "INSERT INTO userss (username, password_hash, email, is_premium) VALUES (%s, %s, %s, %s) RETURNING id;"
         cursor.execute(query, (username, password_hash, email, is_premium))
         user_id = cursor.fetchone()[0]
         conn.commit()
         return user_id
     except Exception as e:
-        print(f"[ERROR] Błąd podczas dodawania użytkownika: {e}")
         conn.rollback()
-        return None
+        print(f"{e}")
+        raise e
     finally:
         close_db_connection(conn, cursor)
 

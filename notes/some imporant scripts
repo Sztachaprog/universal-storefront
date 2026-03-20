@@ -29,6 +29,13 @@ conn.commit()
 cursor.fetchone()	
     Pobiera dokładnie jeden (pierwszy) wiersz z wyniku zapytania.	
     Poproszenie kuriera, żeby podał Ci pierwszy z brzegu dokument ze stosu, który przyniósł.
+len() – "Liczydło"
+    len (skrót od length) to wbudowana funkcja Pythona, która liczy elementy wewnątrz obiektu (listy, słownika, tekstu).
+    Kiedy robisz users = cursor.fetchall(), Python dostaje listę wierszy z bazy.
+    len(users) powie Ci dokładnie, ile tych wierszy jest.
+rollback()
+    Jeśli program wywali w trakcie testu np w połowie funkcji try, to przechodzi do expect i 
+    tam jest rollback co usuwa wszystko co do tej pory się zrobiło w tej funkcji
 
 
 1. Co jest czym? (Słowniczek precyzyjny)
