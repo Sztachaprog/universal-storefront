@@ -1,5 +1,10 @@
-
+import bcrypt
 from src.database import get_db_connection, close_db_connection
+
+
+def register_user(username, password, email):
+    conn = get_db_connection()
+
 
 def add_user(username, password_hash, email, is_premium=False):
     conn = get_db_connection()
@@ -8,15 +13,18 @@ def add_user(username, password_hash, email, is_premium=False):
         
     cursor = conn.cursor()
     try:
-        query = "INSERT INTO userss (username, password_hash, email, is_premium) VALUES (%s, %s, %s, %s) RETURNING id;"
-        cursor.execute(query, (username, password_hash, email, is_premium))
+        query = "INSERT INTO users (username, password_hash, email, is_premium) VALUES (%s, %s, %s, %s) RETURNING id;"
+        byte_password = password_hash.encode('utf-8')
+        salt = bcrypt.gensalt()
+        hashed_password = bcrypt.hashpw(byte_password, salt).decode('utf-8')
+        cursor.execute(query, (username, hashed_password, email))
         user_id = cursor.fetchone()[0]
         conn.commit()
         return user_id
     except Exception as e:
+        print(f"[ERROR] Błąd podczas dodawania użytkownika: {e}")
         conn.rollback()
-        print(f"{e}")
-        raise e
+        return None
     finally:
         close_db_connection(conn, cursor)
 
