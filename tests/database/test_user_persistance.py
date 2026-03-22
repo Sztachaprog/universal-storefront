@@ -1,7 +1,7 @@
 import uuid
 from src.application import add_user
 import psycopg2
-from src.database import get_db_connection, close_db_connection
+from database.database import get_db_connection, close_db_connection
 
 
 

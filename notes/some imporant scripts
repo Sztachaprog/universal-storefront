@@ -36,6 +36,20 @@ len() – "Liczydło"
 rollback()
     Jeśli program wywali w trakcie testu np w połowie funkcji try, to przechodzi do expect i 
     tam jest rollback co usuwa wszystko co do tej pory się zrobiło w tej funkcji
+open()
+    wbudowana funkcja Pythona. 
+    Służy do komunikacji z systemem operacyjnym, aby uzyskać dostęp do plików na dysku. Używa się jej głównie do plików tekstowych, obrazów czy logów.
+with open(file_path, 'r') as file
+    Parametr 'r' (Mode), 
+    To nie może być dowolny ciąg znaków jak "rrrarasd". To jest tryb (mode). Python musi wiedzieć, co zamierzasz robić z plikiem:
+    'r'     Read (Tylko czytanie). Jeśli plik nie istnieje – wywali błąd. To najbezpieczniejszy tryb.
+    'w'     Write (Pisanie). Uwaga: to czyści plik do zera i pisze od nowa!
+    'a'     Append (Dopisanie). Dodaje tekst na końcu pliku.
+.read()
+    to polecenie: "Weź całą zawartość tego pliku i zamień ją w jeden długi tekst (string)"
+with()
+    
+
 
 
 1. Co jest czym? (Słowniczek precyzyjny)
@@ -65,3 +79,6 @@ rollback()
     user: Twoja zmienna, w której zapisujesz wynik.
 
     fetchone(): To komenda dla kursora: "Przynieś mi jeden (one) wynik, który właśnie znalazłeś (fetch)". To jak wyjęcie jednej ryby z sieci, którą kursor zarzucił przez .execute("SELECT...").
+
+
+

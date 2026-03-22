@@ -1,9 +1,12 @@
 import bcrypt
-from src.database import get_db_connection, close_db_connection
+from database.database import get_db_connection, close_db_connection
 
 
 def register_user(username, password, email):
     conn = get_db_connection()
+    cursor = conn.cursor()
+    query = "INSERT INTO users (username, password_hash, email, is_premium) VALUES (%s, %s, %s, %s) RETURNING id;"
+
 
 
 def add_user(username, password_hash, email, is_premium=False):
