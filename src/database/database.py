@@ -12,11 +12,10 @@ connection_params = {
 def get_db_connection():
     try:
         conn = psycopg2.connect(**connection_params)
-        print("[INFO] Database connection established successfully.")
         return conn
     except OperationalError as e:
         print(f"[ERROR] Database connection failed: {e}")
-        return None
+        raise e
 def close_db_connection(conn, cursor=None):
     if cursor:
         cursor.close()
