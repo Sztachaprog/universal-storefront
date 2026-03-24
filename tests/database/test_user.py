@@ -1,5 +1,6 @@
 from src.application import register_user
 import pytest
+import psycopg2
 
 def test_create_user(cursor):
     register_user("bartek", "haslo", "bartek@example.com", is_premium=True)
@@ -14,10 +15,9 @@ def test_create_user(cursor):
     user = cursor.fetchone()
     print(f"Test completed successfully: {user}")
 def test_duplicate_user(cursor):
-        register_user("kacper", "password", "kacper@example.com", is_premium=True)
+        register_user("kacper", "password", "kacper@example.com")
         cursor.execute("SELECT username, password_hash, email, is_premium FROM users WHERE username = 'kacper';")
-        with pytest.raises(Exception):
+        with pytest.raises(psycopg2.errors.UniqueViolation):
              register_user("kacper", "password", "kacper@example.com", is_premium=True)
-def test_drop_database(cursor):
-    cursor.execute("DROP TABLE users CASCADE;")
+
         
