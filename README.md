@@ -15,8 +15,7 @@ Projekt został stworzony w celu nauki architektury systemów oraz automatyzacji
 
 ## 🏗 Struktura projektu
 
-UNIVERSAL-STOREFRONT/
-
+```text
 UNIVERSAL-STOREFRONT/
 ├── src/                          # Serce aplikacji (Logika biznesowa)
 │   ├── database/                 # Folder baz danych
@@ -30,10 +29,11 @@ UNIVERSAL-STOREFRONT/
 │   ├── database/                 # Testy integracyjne bazy danych
 │   │   └── test_user.py          # Testy logiki użytkowników
 │   └── conftest.py               # Konfiguracja i fixture'y dla testów
-├── .gitignore                    # Pliki ignorowane przez Git 
+├── .gitignore                    # Pliki ignorowane przez Git
 ├── docker-compose.yml            # Definicja kontenera z bazą danych
 ├── pyproject.toml                # Konfiguracja Poetry i zależności
 └── README.md                     # Dokumentacja projektu
+```
 
 
 ### 🗄️ Schemat bazy danych
