@@ -17,34 +17,38 @@ Projekt został stworzony w celu nauki architektury systemów oraz automatyzacji
 
 UNIVERSAL-STOREFRONT/
 
-├── 📁 src/ # Serce aplikacji (Logika biznesowa)
-
- │ ├── 📄 database.py # Zarządzanie połączeniem z PostgreSQL (DRY)
- 
- │ └── 📄 application.py # Główne funkcje sklepu (np. dodawanie produktów)
-
-├── 📁 tests/ # Folder testowy (Pytest)
-
- │ ├── 📁 database/ # Testy integracyjne bazy danych
- 
- │ └── 📁 ui/ # Testy Playwright (UI)
-
-├── 📄 docker-compose.yml # Definicja kontenera z bazą danych
-
-├── 📄 pyproject.toml # Konfiguracja Poetry i zależności
-
-├── 📄 README.md # Dokumentacja projektu
-
-└── 📄 .gitignore # Pliki ignorowane przez Git (np. .venv, hasła)
+UNIVERSAL-STOREFRONT/
+├── src/                          # Serce aplikacji (Logika biznesowa)
+│   ├── database/                 # Folder baz danych
+│   │   ├── sql/                  # Skrypty SQL (inicjalizacja bazy)
+│   │   │   ├── schema.sql        # Definicja tabel
+│   │   │   └── seed.sql          # Przykładowe dane startowe
+│   │   ├── database.py           # Zarządzanie połączeniem z PostgreSQL (DRY)
+│   │   └── db_utils.py           # Narzędzia pomocnicze do operacji na bazie
+│   └── application.py            # Główne funkcje aplikacji
+├── tests/                        # Folder testowy (Pytest)
+│   ├── database/                 # Testy integracyjne bazy danych
+│   │   └── test_user.py          # Testy logiki użytkowników
+│   └── conftest.py               # Konfiguracja i fixture'y dla testów
+├── .gitignore                    # Pliki ignorowane przez Git 
+├── docker-compose.yml            # Definicja kontenera z bazą danych
+├── pyproject.toml                # Konfiguracja Poetry i zależności
+└── README.md                     # Dokumentacja projektu
 
 
-### 🗄 Schemat bazy danych
- **Users**
- Column | Type | Constraints | Description |
- :--- | :--- | :--- | :--- |
- `id` | SERIAL | PRIMARY KEY | Unique user identifier |
- `username` | VARCHAR(50) | NOT NULL, UNIQUE | User's display name |
- `is_premium` | BOOLEAN | DEFAULT FALSE | Premium subscription status |
+### 🗄️ Schemat bazy danych
+
+**Users**
+
+| Column | Type | Constraints | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | SERIAL | PRIMARY KEY | Unique user identifier |
+| `username` | VARCHAR(50) | NOT NULL, UNIQUE | User's display name |
+| `password_hash` | TEXT | NOT NULL | Hashed user password |
+| `email` | VARCHAR(100) | NOT NULL, UNIQUE | User's email address |
+| `is_premium` | BOOLEAN | DEFAULT FALSE | Premium subscription status |
+| `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Account creation timestamp |
+| `updated_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Last profile update timestamp |
 
 ## 🚀 Szybki Start
 
