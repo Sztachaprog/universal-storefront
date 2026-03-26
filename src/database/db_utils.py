@@ -12,5 +12,5 @@ def execute_sql_file(file_path):
     conn.commit()
     close_db_connection(conn, cursor)
 
-    print(f"Wykonano skrypt: {file_path}")
+    print(f"Open and execute file: {file_path}")
         

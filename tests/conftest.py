@@ -5,7 +5,7 @@ from src.database.database import get_db_connection, close_db_connection
 @pytest.fixture(scope="session", autouse=True)
 def CreateTestData():
     execute_sql_file("src/database/sql/schema.sql")
-    # execute_sql_file("src/database/sql/seed.sql")
+    execute_sql_file("src/database/sql/seed.sql")
 
 @pytest.fixture(scope="function", autouse=True)
 def cursor(): # Zmieniamy nazwę na bardziej logiczną
@@ -17,11 +17,11 @@ def cursor(): # Zmieniamy nazwę na bardziej logiczną
 def clean_up():  
     conn = get_db_connection()
     cursor = conn.cursor()
-
     cursor.execute("TRUNCATE TABLE users RESTART IDENTITY CASCADE;")
     conn.commit()
 
     yield
+
     close_db_connection(conn, cursor)
     
 
