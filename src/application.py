@@ -24,33 +24,53 @@ def register_user(username, password, email, is_premium=False):
 
 # GET users
 def get_user_by_name(username):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, username, email, is_premium FROM users WHERE username = %s;", (username,))
-    user = cursor.fetchone()
-    close_db_connection(conn, cursor)
-    return user
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, username, email, is_premium FROM users WHERE username = %s;", (username,))
+        user = cursor.fetchone()
+        return user
+    except Exception as e:
+        print(f"[ERROR] while fetching user by name: {e}")
+        raise e
+    finally:
+        close_db_connection(conn, cursor)
 def get_user_by_mail(email):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, username, email, is_premium FROM users WHERE email = %s;", (email,))
-    user = cursor.fetchone()
-    close_db_connection(conn, cursor)
-    return user
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, username, email, is_premium FROM users WHERE email = %s;", (email,))
+        user = cursor.fetchone()
+        return user
+    except Exception as e:
+        print(f"[ERROR] while fetching user by email: {e}")
+        raise e
+    finally:
+        close_db_connection(conn, cursor)
 def get_user_by_id(user_id):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, username, email, is_premium FROM users WHERE id = %s;", (user_id,))
-    user = cursor.fetchone()
-    close_db_connection(conn, cursor)
-    return user
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, username, email, is_premium FROM users WHERE id = %s;", (user_id,))
+        user = cursor.fetchone()
+        return user
+    except Exception as e:
+        print(f"[ERROR] while fetching user by ID: {e}")
+        raise e
+    finally:
+        close_db_connection(conn, cursor)
 def get_user_password_hash(user_id):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT password_hash FROM users WHERE id = %s;", (user_id,))
-    password_hash = cursor.fetchone()
-    close_db_connection(conn, cursor)
-    return password_hash[0] if password_hash else None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT password_hash FROM users WHERE id = %s;", (user_id,))
+        password_hash = cursor.fetchone()
+        return password_hash[0] if password_hash else None
+    except Exception as e:
+        print(f"[ERROR] while fetching user password hash: {e}")
+        raise e
+    finally:
+        close_db_connection(conn, cursor)
 # DELETE users
 def delete_user(user_id):
     try:
@@ -118,14 +138,19 @@ def create_movie(release_date, is_premium_only, language_code, title, descriptio
         close_db_connection(conn, cursor)
 # GET movies
 def get_movie_details(movie_id, language_code):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT movies.id, movies.release_date, movies.is_premium_only, movie_translations.title, movie_translations.description
-        FROM movies 
-        JOIN movies_translations ON movies.id = movie_translations.movie_id
-        WHERE movies.id = %s AND movie_translations.language_code = %s;
-    """, (movie_id, language_code))
-    movie = cursor.fetchone()
-    close_db_connection(conn, cursor)
-    return movie
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT movies.id, movies.release_date, movies.is_premium_only, movie_translations.title, movie_translations.description
+            FROM movies 
+            JOIN movie_translations ON movies.id = movie_translations.movie_id
+            WHERE movies.id = %s AND movie_translations.language_code = %s;
+        """, (movie_id, language_code))
+        movie = cursor.fetchone()
+        return movie
+    except Exception as e:
+        print(f"[ERROR] while fetching movie details: {e}")
+        raise e
+    finally:
+        close_db_connection(conn, cursor)
