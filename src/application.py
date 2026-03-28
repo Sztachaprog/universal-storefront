@@ -1,7 +1,7 @@
 import bcrypt
 from src.database.database import get_db_connection, close_db_connection
 
-# CREATE
+# CREATE users
 def register_user(username, password, email, is_premium=False):
     try:
         conn = get_db_connection()
@@ -22,7 +22,7 @@ def register_user(username, password, email, is_premium=False):
         close_db_connection(conn, cursor)   
 
 
-# GET
+# GET users
 def get_user_by_name(username):
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -51,7 +51,7 @@ def get_user_password_hash(user_id):
     password_hash = cursor.fetchone()
     close_db_connection(conn, cursor)
     return password_hash[0] if password_hash else None
-# DELETE
+# DELETE users
 def delete_user(user_id):
     try:
         conn = get_db_connection()
@@ -64,7 +64,7 @@ def delete_user(user_id):
         raise e
     finally:
         close_db_connection(conn, cursor)   
-# UPDATE
+# UPDATE users
 def update_user_profile(user_id, username, email, is_premium):
     try:
         conn = get_db_connection()
@@ -97,3 +97,35 @@ def update_user_password(user_id, new_password):
     finally:
         close_db_connection(conn, cursor)
 
+
+# CREATE movies
+def create_movie(release_date, is_premium_only, language_code, title, description):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        query_movie = "INSERT INTO movies (release_date, is_premium_only) VALUES (%s, %s) RETURNING id;"
+        cursor.execute(query_movie, (release_date, is_premium_only))
+        movie_id = cursor.fetchone()[0]
+        query_movie_language = "INSERT INTO movie_translations (movie_id, language_code, title, description) VALUES (%s, %s, %s, %s);"
+        cursor.execute(query_movie_language, (movie_id, language_code, title, description))
+        conn.commit()
+        return movie_id
+    except Exception as e:
+        print(f"[ERROR] while creating movie: {e}")
+        conn.rollback()
+        raise e
+    finally:
+        close_db_connection(conn, cursor)
+# GET movies
+def get_movie_details(movie_id, language_code):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT movies.id, movies.release_date, movies.is_premium_only, movie_translations.title, movie_translations.description
+        FROM movies 
+        JOIN movies_translations ON movies.id = movie_translations.movie_id
+        WHERE movies.id = %s AND movie_translations.language_code = %s;
+    """, (movie_id, language_code))
+    movie = cursor.fetchone()
+    close_db_connection(conn, cursor)
+    return movie
