@@ -7,13 +7,6 @@
         created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
     );
-    CREATE TABLE IF NOT EXISTS movies ( -- Creating two tables for a movies to translations relationship
-        id SERIAL PRIMARY KEY,
-        title VARCHAR(200) NOT NULL,
-        description TEXT,
-        release_date DATE,
-        is_premium_only BOOLEAN DEFAULT FALSE
-    );
     CREATE TABLE IF NOT EXISTS movies (
         id SERIAL PRIMARY KEY,
         release_date DATE,
