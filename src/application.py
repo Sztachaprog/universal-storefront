@@ -10,7 +10,7 @@ def register_user(username, password, email, is_premium=False):
         byte_password = password.encode('utf-8')
         salt = bcrypt.gensalt()
         hashed_password = bcrypt.hashpw(byte_password, salt).decode('utf-8')
-        cursor.execute(query, (username, hashed_password, email, is_premium))
+        cursor.execute(query, ( username, hashed_password, email, is_premium))
         user_id = cursor.fetchone()[0]
         conn.commit()
         return user_id

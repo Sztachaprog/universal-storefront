@@ -20,7 +20,7 @@ def test_create_user(cursor):
     assert user[0] == "bartek", f"Where looking for 'bartek', found '{user[0]}'"
     assert user[1] != "haslo", f"Different password than inputed '{user[1]}'"
     assert user[2] == "bartek@example.com", f"Where looking for 'bartek@example.com', found '{user[2]}'"
-    assert user[3] == 1, f"Where looking for is_premium True, found {user[3]}"
+    assert user[3] == True, f"Where looking for is_premium True, found {user[3]}"
     cursor.execute("SELECT username, email, is_premium FROM users WHERE username = 'bartek';")
     user = cursor.fetchone()
     print(f"Test completed successfully: {user}")
@@ -36,22 +36,22 @@ def test_get_user_by_name():
     assert user is not None, "User not found in database"
     assert user[1] == "user", f"Expected username 'user', got '{user[1]}'"
     assert user[2] == "mail@mail.com", f"Expected email 'mail@mail.com', got '{user[2]}'"
-    assert user[3] == 0, f"Expected is_premium False, got {user[3]}"
+    assert user[3] == False, f"Expected is_premium False, got {user[3]}"
 def test_get_user_by_mail():
     register_user("user", "password123", "mail@mail.com")
     user = get_user_by_mail("mail@mail.com")
     assert user is not None, "User not found in database"
     assert user[1] == "user", f"Expected username 'user', got '{user[1]}'"
     assert user[2] == "mail@mail.com", f"Expected email 'mail@mail.com', got '{user[2]}'"
-    assert user[3] == 0, f"Expected is_premium False, got {user[3]}"
+    assert user[3] == False, f"Expected is_premium False, got {user[3]}"
 def test_get_user_by_id():
-    register_user("user", "password123", "mail@mail.com")
-    user = get_user_by_id(1)
+    registered = register_user("user", "password123", "mail@mail.com")
+    user = get_user_by_id(registered)
     assert user is not None, "User not found in database"
-    assert user[0] == 1, f"Expected user ID 1, got '{user[0]}'"
+    assert user[0] == registered, f"Expected user ID {registered}, got '{user[0]}'"
     assert user[1] == "user", f"Expected username 'user', got '{user[1]}'"
     assert user[2] == "mail@mail.com", f"Expected email 'mail@mail.com', got '{user[2]}'"
-    assert user[3] == 0, f"Expected is_premium False, got {user[3]}"
+    assert user[3] == False, f"Expected is_premium False, got {user[3]}"
 # Delete
 def test_delete_user(cursor):
     register_user("user", "password123", "mail@mail.com")
