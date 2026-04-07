@@ -154,3 +154,36 @@ def get_movie_details(movie_id, language_code):
         raise e
     finally:
         close_db_connection(conn, cursor)
+# UPDATE movies
+def update_movie(release_date, is_premium_only, language_code, title, description, movie_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""UPDATE movies
+            SET release_date = %s,
+            is_premium_only = %s, 
+            WHERE id = %s;""", (release_date, is_premium_only))
+        cursor.execute("""UPDATE movie_translations
+            SET language_code = %s,
+            title = %s,
+            description = %s;
+            WHERE movie_id = %s """, (language_code, title, description, movie_id))
+        conn.commit()
+        return movie_id
+    except Exception as e:
+        print(f"[ERROR] while fetching movie details: {e}")
+        raise e
+    finally:
+        close_db_connection(conn, cursor)
+def delete_movie(move_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM movies WHERE id = %s;", (move_id,))
+        conn.commit()
+    except Exception as e:
+        print(f"[ERROR] while deleting user: {e}")
+        conn.rollback()
+        raise e
+    finally:
+        close_db_connection(conn, cursor)   

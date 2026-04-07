@@ -15,5 +15,7 @@ def test_create_movie():
     assert movie_details[2] == True, f"Expected is_premium_only True, got {movie_details[2]}"
     assert movie_details[3] == "Polski film", f"Expected title 'Polski film', got '{movie_details[3]}'"
     assert movie_details[4] == "Opis polskiego filmu", f"Expected description 'Opis polskiego filmu', got '{movie_details[4]}'"
-    
+
+# Update
+def test_get_movie():
     
