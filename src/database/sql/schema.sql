@@ -20,4 +20,14 @@
         description TEXT,
         FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE CASCADE,
         UNIQUE (movie_id, language_code)
+    );
+    CREATE TABLE IF NOT EXISTS user_access (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        movie_id INTEGER NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE CASCADE,
+        UNIQUE (user_id, movie_id)
     );  
+
+

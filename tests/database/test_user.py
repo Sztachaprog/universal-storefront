@@ -6,7 +6,8 @@ from src.application import (
     delete_user,
     update_user_profile,
     update_user_password,
-    get_user_password_hash
+    get_user_password_hash,
+    upgrade_user_to_premium
 )
 import pytest
 import psycopg2
@@ -16,7 +17,7 @@ def test_create_user(cursor):
     register_user("bartek", "haslo", "bartek@example.com", is_premium=True)
     cursor.execute("SELECT username, password_hash, email, is_premium FROM users WHERE username = 'bartek';")
     user = cursor.fetchone()
-    assert user is not None, "Użytkownik nie został znaleziony w bazie danych."
+    assert user is not None, "User not found in database."
     assert user[0] == "bartek", f"Where looking for 'bartek', found '{user[0]}'"
     assert user[1] != "haslo", f"Different password than inputed '{user[1]}'"
     assert user[2] == "bartek@example.com", f"Where looking for 'bartek@example.com', found '{user[2]}'"
@@ -71,3 +72,9 @@ def test_update_user_password():
     update_user_password(1, "newpassword")
     new_password = get_user_password_hash(1)
     assert old_password != new_password, "Password hash should be different after updated"
+def test_upgrade_user_to_premium():
+    non_premium_user = register_user("user", "password123", "mail@mail.com")
+    upgrade_user_to_premium(non_premium_user)
+    premium_user = get_user_by_id(non_premium_user)
+
+    assert premium_user[3] == True, "User not upgraded to premium"

@@ -1,3 +1,5 @@
+
+
 import bcrypt
 from src.database.database import get_db_connection, close_db_connection
 
@@ -101,6 +103,18 @@ def update_user_profile(user_id, username, email, is_premium):
         raise e
     finally:
         close_db_connection(conn, cursor)   
+def upgrade_user_to_premium(user_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE users SET is_premium = TRUE where id = %s;", (user_id,))
+        conn.commit()
+    except Exception as e:
+        print(f"[ERROR] while upgrading user to premium: {e}")
+        conn.rollback()
+        raise e
+    finally:
+        close_db_connection(conn, cursor)
 def update_user_password(user_id, new_password):
     try:
         conn = get_db_connection()
@@ -191,3 +205,27 @@ def delete_movie(move_id):
         raise e
     finally:
         close_db_connection(conn, cursor)   
+
+
+
+def process_watch_request(user_id, movie_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Check if user is premium
+        cursor.execute("SELECT is_premium FROM users WHERE id = %s;", (user_id,))
+        is_user_premium = cursor.fetchone()[0]
+        #check if movie is premium only
+        cursor.execute("SELECT is_premium_only FROM movies WHERE id = %s;", (movie_id,))
+        is_movie_premium_only = cursor.fetchone()[0]
+
+        if is_user_premium == False and is_movie_premium_only == True:
+            return False
+        else:
+            return True
+    except Exception as e:
+        print(f"[ERROR] while processing watch request: {e}")
+        raise e
+    finally:
+        close_db_connection(conn, cursor)
