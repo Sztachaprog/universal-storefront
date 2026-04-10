@@ -9,7 +9,7 @@ Scope (zasięg) decyduje o tym, jak często fixture jest uruchamiana.
 
 Po co to? Dla wydajności. Łączenie z bazą lub odpalanie przeglądarki trwa. Scope pozwala zaoszczędzić czas.
 
-
+poetry add pytest-playwright
 
 
 
