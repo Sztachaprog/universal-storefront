@@ -1,7 +1,4 @@
-
-
 from venv import logger
-
 import bcrypt
 from src.database.database import get_db_connection, close_db_connection
 
@@ -234,9 +231,6 @@ def grant_ppv_access(user_id, movie_id, cursor):
         logger.error(f"Error granting PPV access for user_id: {user_id}, movie_id: {movie_id}")
         cursor.rollback()
         return False, "Error granting PPV access"
-
-    finally:
-        close_db_connection(conn, cursor)
     
 
 def process_watch_request(user_id, movie_id):
