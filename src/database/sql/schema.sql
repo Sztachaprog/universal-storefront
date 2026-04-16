@@ -25,6 +25,8 @@
         id SERIAL PRIMARY KEY,
         user_id INTEGER NOT NULL,
         movie_id INTEGER NOT NULL,
+        created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
+        expires_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW() + INTERVAL '30 days',
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
         FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE CASCADE,
         UNIQUE (user_id, movie_id)

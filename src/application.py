@@ -1,5 +1,7 @@
 
 
+from venv import logger
+
 import bcrypt
 from src.database.database import get_db_connection, close_db_connection
 
@@ -207,6 +209,35 @@ def delete_movie(move_id):
         close_db_connection(conn, cursor)   
 
 
+# Access control
+def grant_ppv_access(user_id, movie_id, cursor):
+    try:
+        cursor.execute("SELECT is_premium FROM users WHERE id = %s;", (user_id,))
+        is_user_premium = cursor.fetchone()[0]
+
+        if is_user_premium:
+            return False, "User already has premium access"
+        if user_id is None or movie_id is None:
+            return False, "Invalid user ID or movie ID"
+
+
+        # New ppv access for user 
+        cursor.execute("INSERT INTO user_access (user_id, movie_id) VALUES user_id = %s, movie_id = %s RETURNING id; "(user_id, movie_id))
+        new_ppv = cursor.fetchone()[0]
+
+        
+        cursor.commit()
+        return True, "PPV access granted"
+
+
+    except:
+        logger.error(f"Error granting PPV access for user_id: {user_id}, movie_id: {movie_id}")
+        cursor.rollback()
+        return False, "Error granting PPV access"
+
+    finally:
+        close_db_connection(conn, cursor)
+    
 
 def process_watch_request(user_id, movie_id):
     try:
@@ -216,14 +247,22 @@ def process_watch_request(user_id, movie_id):
         # Check if user is premium
         cursor.execute("SELECT is_premium FROM users WHERE id = %s;", (user_id,))
         is_user_premium = cursor.fetchone()[0]
+
         #check if movie is premium only
         cursor.execute("SELECT is_premium_only FROM movies WHERE id = %s;", (movie_id,))
         is_movie_premium_only = cursor.fetchone()[0]
 
-        if is_user_premium == False and is_movie_premium_only == True:
-            return False
-        else:
-            return True
+        # Check if user have ppv access
+        cursor.execute("SELECT user_id, movie_id, expires_at FROM user_access " \
+        "WHERE user_id = %s AND movie_id = %s AND expires_at > NOW();", (user_id, movie_id,))
+        result = cursor.fetchone()
+        has_ppv_access = result is not None
+
+        return(
+            is_user_premium
+            or not is_movie_premium_only
+            or has_ppv_access
+        )
     except Exception as e:
         print(f"[ERROR] while processing watch request: {e}")
         raise e

@@ -15,7 +15,7 @@ def cursor(): # Zmieniamy nazwę na bardziej logiczną
 
     yield cursor # Dajemy testowi kursor, a nie całe połączenie!
 
-    cursor.execute("TRUNCATE TABLE users, movies RESTART IDENTITY CASCADE;")
+    cursor.execute("TRUNCATE TABLE users, movies, user_access, movie_access RESTART IDENTITY CASCADE;")
     conn.commit()
     close_db_connection(conn, cursor) # Sprzątamy oba
 
