@@ -7,7 +7,7 @@ def CreateTestData():
     execute_sql_file("src/database/sql/schema.sql")
 
 @pytest.fixture(scope="function", autouse=True)
-def cursor(): # Zmieniamy nazwę na bardziej logiczną
+def cursor(): 
     conn = get_db_connection()
     cursor = conn.cursor() # Tworzymy kursor
 
