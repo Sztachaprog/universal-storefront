@@ -3,24 +3,15 @@ import bcrypt
 from src.database.database import get_db_connection, close_db_connection
 
 # CREATE users
-def register_user(username, password, email, is_premium=False):
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
+def register_user(username, password, email, is_premium=False, cursor = None):
+
         query = "INSERT INTO users (username, password_hash, email, is_premium) VALUES (%s, %s, %s, %s) RETURNING id;"
         byte_password = password.encode('utf-8')
         salt = bcrypt.gensalt()
         hashed_password = bcrypt.hashpw(byte_password, salt).decode('utf-8')
         cursor.execute(query, ( username, hashed_password, email, is_premium))
         user_id = cursor.fetchone()[0]
-        conn.commit()
         return user_id
-    except Exception as e:
-        print(f"[ERROR] while registering user: {e}")
-        conn.rollback()
-        raise e
-    finally:
-        close_db_connection(conn, cursor)   
 
 
 # GET users
@@ -192,11 +183,11 @@ def update_movie(release_date, is_premium_only, language_code, title, descriptio
         raise e
     finally:
         close_db_connection(conn, cursor)
-def delete_movie(move_id):
+def delete_movie(movie_id):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM movies WHERE id = %s;", (move_id,))
+        cursor.execute("DELETE FROM movies WHERE id = %s;", (movie_id,))
         conn.commit()
     except Exception as e:
         print(f"[ERROR] while deleting user: {e}")
@@ -207,8 +198,8 @@ def delete_movie(move_id):
 
 
 # Access control
-def grant_ppv_access(user_id, movie_id, cursor):
-    try:
+def grant_ppv_access(user_id, movie_id, cursor = None):
+
         cursor.execute("SELECT is_premium FROM users WHERE id = %s;", (user_id,))
         is_user_premium = cursor.fetchone()[0]
 
@@ -222,15 +213,8 @@ def grant_ppv_access(user_id, movie_id, cursor):
         cursor.execute("INSERT INTO user_access (user_id, movie_id) VALUES user_id = %s, movie_id = %s RETURNING id; "(user_id, movie_id))
         new_ppv = cursor.fetchone()[0]
 
-        
-        cursor.commit()
         return True, "PPV access granted"
 
-
-    except:
-        logger.error(f"Error granting PPV access for user_id: {user_id}, movie_id: {movie_id}")
-        cursor.rollback()
-        return False, "Error granting PPV access"
     
 
 def process_watch_request(user_id, movie_id):

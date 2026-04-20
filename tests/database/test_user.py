@@ -14,7 +14,7 @@ import psycopg2
 
 #Create
 def test_create_user(cursor):
-    register_user("bartek", "haslo", "bartek@example.com", is_premium=True)
+    register_user("bartek", "haslo", "bartek@example.com", is_premium=True, cursor=cursor)
     cursor.execute("SELECT username, password_hash, email, is_premium FROM users WHERE username = 'bartek';")
     user = cursor.fetchone()
     assert user is not None, "User not found in database."

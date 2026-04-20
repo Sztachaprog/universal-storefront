@@ -10,13 +10,10 @@ def CreateTestData():
 def cursor(): # Zmieniamy nazwę na bardziej logiczną
     conn = get_db_connection()
     cursor = conn.cursor() # Tworzymy kursor
-    cursor.execute("TRUNCATE TABLE users, movies RESTART IDENTITY CASCADE;")
-    conn.commit()
 
     yield cursor # Dajemy testowi kursor, a nie całe połączenie!
 
-    cursor.execute("TRUNCATE TABLE users, movies, user_access, movie_access RESTART IDENTITY CASCADE;")
-    conn.commit()
+    conn.rollback() # Cofamy wszelkie zmiany dokonane przez test
     close_db_connection(conn, cursor) # Sprzątamy oba
 
 
