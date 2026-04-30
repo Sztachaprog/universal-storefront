@@ -112,20 +112,22 @@ def delete_movie(movie_id, cursor = None):
 # Access control
 def grant_ppv_access(user_id, movie_id, cursor = None):
 
-        cursor.execute("SELECT is_premium FROM users WHERE id = %s;", (user_id,))
-        is_user_premium = cursor.fetchone()[0]
-
-        if is_user_premium:
-            return False, "User already has premium access"
         if user_id is None or movie_id is None:
             return False, "Invalid user ID or movie ID"
 
+        cursor.execute("SELECT is_premium FROM users WHERE id = %s;", (user_id,))
+        is_user_premium = cursor.fetchone()[0]
+
+
+        if is_user_premium:
+            return False, "User already has premium access"
+
 
         # New ppv access for user 
-        cursor.execute("INSERT INTO user_access (user_id, movie_id) VALUES (%s,  %s) RETURNING id; "(user_id, movie_id))
+        cursor.execute("INSERT INTO user_access (user_id, movie_id) VALUES (%s,  %s) RETURNING id; ", (user_id, movie_id))
         new_ppv = cursor.fetchone()[0]
 
-        return True, "PPV access granted"
+        return True, new_ppv
 
     
 
