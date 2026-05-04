@@ -1,6 +1,16 @@
 from flask import Flask, request, render_template_string
-from src.application import register_user, get_user_by_name, upgrade_user_to_premium, get_user_password_hash
+from src.database.database import (
+    get_db_connection,
+    close_db_connection
+)
+from src.application import (
+register_user, 
+get_user_by_name, 
+upgrade_user_to_premium, 
+get_user_password_hash
+)
 import bcrypt
+import psycopg2
 
 app = Flask(__name__)
 
@@ -319,39 +329,105 @@ DASHBOARD_PAGE = """
 """
 
 @app.route("/")
-def index():
-    return render_template_string(LOGIN_PAGE, error=None)
+def home():
+    return "<h1>Hello</h1>"
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        try: 
+            username = request.form["username"] 
+            password = request.form["password"] 
+            user = get_user_by_name(username, cursor=cursor)
+            if user is None:
+                return "User not found. <a href='/login'>Go back</a>"         
+            stored_hash = get_user_password_hash(user[0], cursor=cursor)
+            
+            if bcrypt.checkpw(password.encode("utf-8"), stored_hash.encode("utf-8")):
+                return "Login successful! <a href='/home'>Go to main page</a>"
+            
+            return "Wrong password! <a href='/login'>Try Again</a>"
+
+            
+        except Exception as e:
+            return f"login failed: {e}"
+        finally:
+            close_db_connection(conn, cursor)
+    else:
+        return """
+        <form method="POST" action="/login">
+        <input type="text" name="username" placeholder="username">
+        <input type="password" name="password" placeholder="password">
+        <button type="submit">Login</button>
+    </form>
+    """
+
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
-        email = request.form["email"]
+        conn = get_db_connection()
+        cursor = conn.cursor()
         try:
-            register_user(username, password, email)
-            return render_template_string(REGISTER_PAGE, error=None, success="Registration successful! You can now sign in.")
+            username = request.form["username"] 
+            password = request.form["password"] 
+            email = request.form["email"]
+            register_user(username, password, email, cursor=cursor)
+            conn.commit()
+            return "Registration successful! <a href='/login'>Go to login</a>"
         except Exception as e:
-            return render_template_string(REGISTER_PAGE, error=str(e), success=None)
-    return render_template_string(REGISTER_PAGE, error=None, success=None)
+            conn.rollback()
+            return f"Registration failed: {e}"
+        finally:
+            close_db_connection(conn, cursor)
+    else:
+        return """
+        <form method="POST" action="/register">
+        <input type="text" name="username" placeholder="username">
+        <input type="password" name="password" placeholder="password">
+        <input type="email" name="email" placeholder="email">
+        <button type="submit">Register</button>
+    </form>
+    """
 
-@app.route("/login", methods=["POST"])
-def login():
-    username = request.form["username"]
-    password = request.form["password"]
-    user = get_user_by_name(username)
-    if user is None:
-        return render_template_string(LOGIN_PAGE, error="User not found.")
-    stored_hash = get_user_password_hash(user[0])
-    if bcrypt.checkpw(password.encode("utf-8"), stored_hash.encode("utf-8")):
-        return render_template_string(DASHBOARD_PAGE, username=user[1], is_premium=user[3], user_id=user[0])
-    return render_template_string(LOGIN_PAGE, error="Invalid password.")
 
-@app.route("/upgrade", methods=["POST"])
-def upgrade():
-    user_id = request.form["user_id"]
-    upgrade_user_to_premium(user_id)
-    return render_template_string(DASHBOARD_PAGE, username="user", is_premium=True, user_id=user_id)
 
-if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+# @app.route("/")
+# def index():
+#     return render_template_string(LOGIN_PAGE, error=None)
+
+# @app.route("/register", methods=["GET", "POST"])
+# def register(cursor = None):
+#     if request.method == "POST":
+#         username = request.form["username"]
+#         password = request.form["password"]
+#         email = request.form["email"]
+#         try:
+#             register_user(username, password, email, cursor=cursor)
+#             return render_template_string(REGISTER_PAGE, error=None, success="Registration successful! You can now sign in.")
+#         except Exception as e:
+#             return render_template_string(REGISTER_PAGE, error=str(e), success=None)
+#     return render_template_string(REGISTER_PAGE, error=None, success=None)
+
+# @app.route("/login", methods=["POST"])
+# def login():
+#     username = request.form["username"]
+#     password = request.form["password"]
+#     user = get_user_by_name(username, cursor=None)
+#     if user is None:
+#         return render_template_string(LOGIN_PAGE, error="User not found.")
+#     stored_hash = get_user_password_hash(user[0], cursor=None)
+#     if bcrypt.checkpw(password.encode("utf-8"), stored_hash.encode("utf-8")):
+#         return render_template_string(DASHBOARD_PAGE, username=user[1], is_premium=user[3], user_id=user[0])
+#     return render_template_string(LOGIN_PAGE, error="Invalid password.")
+
+# @app.route("/upgrade", methods=["POST"])
+# def upgrade():
+#     user_id = request.form["user_id"]
+#     upgrade_user_to_premium(user_id, cursor=None)
+#     return render_template_string(DASHBOARD_PAGE, username="user", is_premium=True, user_id=user_id)
+
+# if __name__ == "__main__":
+#     app.run(debug=True, port=5000)
