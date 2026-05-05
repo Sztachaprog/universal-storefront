@@ -17,22 +17,25 @@ Projekt został stworzony w celu nauki architektury systemów oraz automatyzacji
 
 ```text
 UNIVERSAL-STOREFRONT/
-├── src/                          # Serce aplikacji (Logika biznesowa)
-│   ├── database/                 # Folder baz danych
-│   │   ├── sql/                  # Skrypty SQL (inicjalizacja bazy)
-│   │   │   ├── schema.sql        # Definicja tabel
-│   │   │   └── seed.sql          # Przykładowe dane startowe
-│   │   ├── database.py           # Zarządzanie połączeniem z PostgreSQL (DRY)
-│   │   └── db_utils.py           # Narzędzia pomocnicze do operacji na bazie
-│   └── application.py            # Główne funkcje aplikacji
-├── tests/                        # Folder testowy (Pytest)
-│   ├── database/                 # Testy integracyjne bazy danych
-│   │   └── test_user.py          # Testy logiki użytkowników
-│   └── conftest.py               # Konfiguracja i fixture'y dla testów
-├── .gitignore                    # Pliki ignorowane przez Git
-├── docker-compose.yml            # Definicja kontenera z bazą danych
-├── pyproject.toml                # Konfiguracja Poetry i zależności
-└── README.md                     # Dokumentacja projektu
+├── src/                         			# Kod źródłowy aplikacji
+│   ├── database/                 			# Warstawa dostępu do danych (połączenie, zapytania SQL)
+│   │   ├── sql/                  			# Skrypty SQL (inicjalizacja bazy)
+│   │   │   └── schema.sql                  # Przykładowe dane startowe
+│   │   ├── database.py           			# Zarządzanie połączeniem z PostgreSQL
+│   │   └── db_utils.py           			# Narzędzia pomocnicze do operacji na bazie
+│   ├── __init__.py               			# Umożliwenie importu src/ między modułami
+│   ├── app.py                   			# Serwer Flask - (UI)
+│   └── application.py           			# Główne funkcje aplikacji
+├── tests/                       			# Folder testowy (Pytest)
+│   ├── database/                			# Testy integracyjne bazy danych
+│   │   ├── test_access.py             		# Testy logiki dostępów
+│   │   ├── test_movie.py         			# Testy logiki filmów
+│   │   └── test_user.py         			# Testy logiki użytkowników
+│   └── conftest.py             			# Konfiguracja i fixture'y dla testów
+├── .gitignore                   			# Pliki ignorowane przez Git
+├── docker-compose.yml           			# Definicja kontenera z bazą danych
+├── pyproject.toml               			# Konfiguracja Poetry i zależności
+└── README.md                    			# Dokumentacja projektu
 ```
 
 
@@ -50,6 +53,37 @@ UNIVERSAL-STOREFRONT/
 | `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Account creation timestamp |
 | `updated_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Last profile update timestamp |
 
+**Movies**
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | SERIAL | PRIMARY KEY | Unique movie identifier |
+| `release_date` | DATE | | Movie release date |
+| `is_premium_only` | BOOLEAN | DEFAULT FALSE | Whether movie requires premium subscription |
+
+**Movie Translations**
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | SERIAL | PRIMARY KEY | Unique translation identifier |
+| `movie_id` | INTEGER | NOT NULL, FK → movies(id) ON DELETE CASCADE | Reference to parent movie |
+| `language_code` | VARCHAR(2) | NOT NULL | ISO 639-1 language code (e.g. `pl`, `en`) |
+| `title` | VARCHAR(200) | NOT NULL | Localized movie title |
+| `description` | TEXT | | Localized movie description |
+| `movie_id + language_code` | | UNIQUE | One translation per language per movie |
+
+**User Access**
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | SERIAL | PRIMARY KEY | Unique access record identifier |
+| `user_id` | INTEGER | NOT NULL, FK → users(id) ON DELETE CASCADE | Reference to user |
+| `movie_id` | INTEGER | NOT NULL, FK → movies(id) ON DELETE CASCADE | Reference to movie |
+| `created_at` | TIMESTAMP | DEFAULT NOW() | Access grant timestamp |
+| `expires_at` | TIMESTAMP | DEFAULT NOW() + 30 days | Access expiry timestamp |
+| `user_id + movie_id` | | UNIQUE | One access record per user per movie |
+
+
 ## 🚀 Szybki Start
 
 ### 1. Wymagania wstępne
@@ -59,20 +93,21 @@ Upewnij się, że masz zainstalowane:
 - Poetry
 
 ### 2. Instalacja i uruchomienie
-# Sklonuj projekt
-git clone <url-twojego-repozytorium>
+#### Sklonuj projekt
+git clone https://github.com/Sztachaprog/universal-storefront.git
 
-# Zainstaluj biblioteki przez Poetry
+#### Zainstaluj biblioteki przez Poetry
 poetry install
 
-# Uruchom bazę danych w Dockerze
+#### Uruchom bazę danych w Dockerze
 docker-compose up -d
  Uruchom wszystkie testy z logami w terminalu
 poetry run pytest -s
 
 
 
-​💡 Rozwiązywane problemy
+​💡 Rozwiązane problemy
+
 ​Port bazy danych: Projekt korzysta z portu 5433, aby uniknąć konfliktów z lokalnymi instalacjami PostgreSQL
 
 
