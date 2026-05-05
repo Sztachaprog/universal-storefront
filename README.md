@@ -1,9 +1,9 @@
 # Universal Storefront - QA Automation Framework
 
-## 🎯 Cel projektu
+##  Cel projektu
 Projekt został stworzony w celu nauki architektury systemów oraz automatyzacji testów na wielu poziomach (E2E). Symuluje on backend i frontend sklepu internetowego, łącząc testy bazy danych z testami UI.
 
-## 🛠 Narzędzia i Technologie
+##  Narzędzia i Technologie
 - **Python 3.12+**: Główny język programowania (logika aplikacji).
 - **Docker & Docker Compose**: Konteneryzacja bazy danych PostgreSQL.
 - **Poetry**: Zarządzanie zależnościami i środowiskiem wirtualnym.
@@ -13,7 +13,7 @@ Projekt został stworzony w celu nauki architektury systemów oraz automatyzacji
 - **Playwright**: (W trakcie wdrażania) Automatyzacja testów UI w przeglądarce.
 - **GitHub Actions**: (W trakcie wdrażania) Automatyzacja testów (CI/CD) przy każdej zmianie w kodzie.
 
-## 🏗 Struktura projektu
+##  Struktura projektu
 
 ```text
 UNIVERSAL-STOREFRONT/
@@ -39,7 +39,7 @@ UNIVERSAL-STOREFRONT/
 ```
 
 
-### 🗄️ Schemat bazy danych
+###  Schemat bazy danych
 
 **Users**
 
@@ -84,7 +84,7 @@ UNIVERSAL-STOREFRONT/
 | `user_id + movie_id` | | UNIQUE | One access record per user per movie |
 
 
-## 🚀 Szybki Start
+##  Szybki Start
 
 ### 1. Wymagania wstępne
 Upewnij się, że masz zainstalowane:
@@ -107,7 +107,7 @@ poetry run pytest -s
 
 
 
-​💡 Rozwiązane problemy
+​ Rozwiązane problemy
 
 ​Port bazy danych: Projekt korzysta z portu 5433, aby uniknąć konfliktów z lokalnymi instalacjami PostgreSQL
 
