@@ -101,7 +101,8 @@ poetry install
 
 #### Uruchom bazę danych w Dockerze
 docker-compose up -d
- Uruchom wszystkie testy z logami w terminalu
+ 
+#### Uruchom wszystkie testy z logami w terminalu
 poetry run pytest -s
 
 
