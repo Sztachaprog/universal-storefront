@@ -1,0 +1,29 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Storefront — Dashboard</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="card dashboard-card">
+    <div class="logo">Universal Storefront</div>
+    <h1>Welcome,<br><span class="welcome-name">{{ username }}</span>.</h1>
+    <hr class="divider">
+    {% if is_premium %}
+    <div class="status-badge active" id="premium-status">Premium Active</div>
+    <p style="font-size:0.8rem; color: var(--muted);">You have full access to all content.</p>
+    {% else %}
+    <div class="status-badge inactive" id="premium-status">Standard Plan</div>
+    <p style="font-size:0.8rem; color: var(--muted); margin-bottom: 1.5rem;">Upgrade to unlock all premium content.</p>
+    <form method="POST" action="/upgrade">
+        <input type="hidden" name="user_id" value="{{ user_id }}">
+        <button type="submit" id="upgrade-btn">Upgrade to Premium →</button>
+    </form>
+    {% endif %}
+    <a href="/" class="link" style="margin-top:2rem;">← Sign out</a>
+</div>
+</body>
+</html>

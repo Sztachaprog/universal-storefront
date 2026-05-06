@@ -1,0 +1,32 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Storefront — Login</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="card">
+    <div class="logo">Universal Storefront</div>
+    <h1>Sign<br>in.</h1>
+    <p class="subtitle">Access your account</p>
+    {% if error %}
+    <div class="alert error" id="login-error">{{ error }}</div>
+    {% endif %}
+    <form method="POST" action="/login">
+        <div class="field">
+            <label>Username</label>
+            <input type="text" name="username" placeholder="your_username" required>
+        </div>
+        <div class="field">
+            <label>Password</label>
+            <input type="password" name="password" placeholder="••••••••" required>
+        </div>
+        <button type="submit">Continue →</button>
+    </form>
+    <p class="link">No account? <a href="/register">Register here</a></p>
+</div>
+</body>
+</html>
