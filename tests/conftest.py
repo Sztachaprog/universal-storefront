@@ -9,11 +9,11 @@ def CreateTestData():
 @pytest.fixture(scope="function", autouse=True)
 def cursor(): 
     conn = get_db_connection()
-    cursor = conn.cursor() # Tworzymy kursor
+    cursor = conn.cursor() 
 
-    yield cursor # Dajemy testowi kursor, a nie całe połączenie!
+    yield cursor 
 
-    conn.rollback() # Cofamy wszelkie zmiany dokonane przez test
-    close_db_connection(conn, cursor) # Sprzątamy oba
+    conn.rollback() 
+    close_db_connection(conn, cursor) 
 
 
