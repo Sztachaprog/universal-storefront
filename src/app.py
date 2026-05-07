@@ -56,7 +56,7 @@ def register():
             email = request.form["email"]
             register_user(username, password, email, cursor=cursor)
             conn.commit()
-            return render_template("login.html", error=None, success="Succesfully registered")
+            return render_template("register.html", error=None, success="Succesfully registered")
         except Exception as e:
             conn.rollback()
             return render_template("register.html", error=str(e), success=None)
