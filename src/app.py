@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect, session, url_for
 
 from src.database.database import (
     get_db_connection,
@@ -15,11 +15,20 @@ import bcrypt
 import psycopg2
 
 app = Flask(__name__)
+app.secret_key = "dev-secret-key"
 
 
 @app.route("/")
 def home():
     return render_template("login.html")
+
+@app.route("/dashboard")
+def dashboard():
+    return render_template("dashboard.html", 
+        username=session["username"],
+        is_premium=session["is_premium"],
+        user_id=session["user_id"]
+    )
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -35,7 +44,10 @@ def login():
             stored_hash = get_user_password_hash(user[0], cursor=cursor)
             
             if bcrypt.checkpw(password.encode("utf-8"), stored_hash.encode("utf-8")):
-                return render_template("dashboard.html", username=user[1], is_premium=user[3], user_id=user[0])
+                session["username"] = user[1]
+                session["user_id"] = user[0]
+                session["is_premium"] = user[3]
+                return redirect(url_for("dashboard"))
             return render_template("login.html", error="Wrong password", success=None)
                    
         except Exception as e:
@@ -78,7 +90,8 @@ def upgrade():
                 return render_template("dashboard.html", error="already premium")              
             upgrade_user_to_premium(user_id, cursor=cursor)
             conn.commit()
-            return render_template("dashboard.html", username="user", is_premium=True, user_id=user_id)
+            session["is_premium"] = True
+            return redirect(url_for("dashboard"))
         except Exception as e:
             conn.rollback()
             return render_template("dashboard.html", error=str(e), success=None)

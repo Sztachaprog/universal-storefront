@@ -12,7 +12,7 @@ def register_user(username, password, email, is_premium=False, cursor = None):
         cursor.execute(query, ( username, hashed_password, email, is_premium))
         user_id = cursor.fetchone()[0]
         return user_id
-
+        
 
 # GET users
 def get_user_by_name(username, cursor = None):

@@ -4,6 +4,7 @@ from playwright.sync_api import (
 )
 from src.database.database import get_db_connection, close_db_connection
 from src.application import(
+    get_user_by_id,
     register_user
 )
 
@@ -18,12 +19,28 @@ def test_register(page):
     expect(page.locator("#register-success")).to_be_visible()
 
 
-def test_login(page):
+def test_login(page, cursor, conn):
+    
+    register_user("testusername", "testpassword", "testuser@mail.com", is_premium=False, cursor=cursor)
+    conn.commit()
+    page.goto("http://localhost:5000/login")
+    page.fill("input[name='username']", "testusername")
+    page.fill("input[name='password']", "testpassword")
+    page.click("button[type='submit']")
+    expect(page.locator(".welcome-name")).to_have_text("testusername")
+
+def test_upgrade_to_premium(page, cursor, conn):
+    user = register_user("testusername", "testpassword", "testuser@mail.com", is_premium=False, cursor=cursor)
+    conn.commit()
+    page.goto("http://localhost:5000/login")
+    page.fill("input[name='username']", "testusername")
+    page.fill("input[name='password']", "testpassword")
+    page.click("button[type='submit']")
+    page.click("#upgrade-btn")
+    
+    is_premium = get_user_by_id(user, cursor=cursor)
+    expect(page.locator("#premium-status")).to_be_visible()
+    assert is_premium[3] == True, "Premium should be premium"
     
 
-    page.goto("http://localhost:5000/login")
-    page.fill("input[name='username']", "siema11")
-    page.fill("input[name='password']", "siema22")
-    page.click("button[type='submit']")
-    expect(page.locator(".welcome-name")).to_have_text("siema11")
-
+    
