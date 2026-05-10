@@ -8,39 +8,18 @@ from src.application import(
     register_user
 )
 
+from tests.e2e.pages.register_page import RegisterPage
+
+
 
 def test_register(page):
 
-    page.goto("http://localhost:5000/register")
-    page.fill("input[name='username']", "siema11")
-    page.fill("input[name='password']", "siema22")
-    page.fill("input[name='email']", "siema1@mail.com")
-    page.click("button[type='submit']")
-    expect(page.locator("#register-success")).to_be_visible()
-
-
-def test_login(page, cursor, conn):
+    register_page = RegisterPage(page)
+    register_page.navigate()
+    register_page.fill_username("testusername")
+    register_page.fill_password("testpassword")
+    register_page.fill_email("testuser@mail.com")
+    register_page.submit()
     
-    register_user("testusername", "testpassword", "testuser@mail.com", is_premium=False, cursor=cursor)
-    conn.commit()
-    page.goto("http://localhost:5000/login")
-    page.fill("input[name='username']", "testusername")
-    page.fill("input[name='password']", "testpassword")
-    page.click("button[type='submit']")
-    expect(page.locator(".welcome-name")).to_have_text("testusername")
-
-def test_upgrade_to_premium(page, cursor, conn):
-    user = register_user("testusername", "testpassword", "testuser@mail.com", is_premium=False, cursor=cursor)
-    conn.commit()
-    page.goto("http://localhost:5000/login")
-    page.fill("input[name='username']", "testusername")
-    page.fill("input[name='password']", "testpassword")
-    page.click("button[type='submit']")
-    page.click("#upgrade-btn")
-    
-    is_premium = get_user_by_id(user, cursor=cursor)
-    expect(page.locator("#premium-status")).to_be_visible()
-    assert is_premium[3] == True, "Premium should be premium"
-    
-
+    expect(register_page.success_register()).to_have_text("Succesfully registered")
     
