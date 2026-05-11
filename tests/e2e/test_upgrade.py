@@ -1,5 +1,4 @@
 from playwright.sync_api import (
-    sync_playwright,
     expect
 )
 from src.database.database import get_db_connection, close_db_connection

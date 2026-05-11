@@ -1,0 +1,55 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: storefront
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4       # download code from repo
+
+      - name: Setup Python
+        uses: actions/setup-python@v5   # uses - you using github function
+        with:
+          python-version: '3.14'
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Install dependencies
+        run: poetry install
+
+      - name: Install Playwright browsers
+        run: poetry run playwright install --with-deps chromium # --with-deps - library etc to use browser on ubuntu
+
+      - name: Run integration tests
+        run: poetry run pytest tests/database
+
+      - name: Start Flask
+        run: poetry run python -m flask --app src.app run --port 5000 &
+      
+      - name: Wait for Flask
+        run: sleep 3
+
+      - name: Run E2E tests
+        run: poetry run pytest tests/e2e
