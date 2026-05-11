@@ -26,10 +26,10 @@ jobs:
           --health-retries 5
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4       # download code from repo
+        uses: actions/checkout@v4           # download code from repo
 
       - name: Setup Python
-        uses: actions/setup-python@v5   # uses - you using github function
+        uses: actions/setup-python@v5       # uses - you using github function
         with:
           python-version: '3.14'
 

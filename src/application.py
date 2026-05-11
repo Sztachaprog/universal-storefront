@@ -6,11 +6,20 @@ from src.database.database import get_db_connection, close_db_connection
 def register_user(username, password, email, is_premium=False, cursor = None):
 
         query = "INSERT INTO users (username, password_hash, email, is_premium) VALUES (%s, %s, %s, %s) RETURNING id;"
+        if len(password) < 8:
+                raise ValueError("Password too short")
+        user_username = get_user_by_name(username, cursor=cursor)
+        if user_username is not None:
+                raise ValueError("Username exist")
+        user_mail = get_user_by_mail(email, cursor=cursor)
+        if user_mail is not None:
+                raise ValueError("Email exist")
         byte_password = password.encode('utf-8')
         salt = bcrypt.gensalt()
         hashed_password = bcrypt.hashpw(byte_password, salt).decode('utf-8')
         cursor.execute(query, ( username, hashed_password, email, is_premium))
         user_id = cursor.fetchone()[0]
+
         return user_id
         
 
