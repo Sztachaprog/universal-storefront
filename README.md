@@ -1,45 +1,67 @@
 # Universal Storefront - QA Automation Framework
+A portfolio project built to demonstrate multi-layer test automation across database, business logic, and UI levels. The project simulates a VOD streaming platform with user management, a movie catalog, and a premium subscription system
 
-##  Cel projektu
-Projekt został stworzony w celu nauki architektury systemów oraz automatyzacji testów na wielu poziomach (E2E). Symuluje on backend i frontend sklepu internetowego, łącząc testy bazy danych z testami UI.
+##  What This Project Tests
+The framework covers three layers of testing:
 
-##  Narzędzia i Technologie
-- **Python 3.12+**: Główny język programowania (logika aplikacji).
-- **Docker & Docker Compose**: Konteneryzacja bazy danych PostgreSQL.
-- **Poetry**: Zarządzanie zależnościami i środowiskiem wirtualnym.
-- **PostgreSQL**: Relacyjna baza danych.
-- **Pytest**: Framework do uruchamiania i raportowania testów.
-- **Psycopg2**: Sterownik do komunikacji Pythona z bazą SQL.
-- **Playwright**: (W trakcie wdrażania) Automatyzacja testów UI w przeglądarce.
-- **GitHub Actions**: (W trakcie wdrażania) Automatyzacja testów (CI/CD) przy każdej zmianie w kodzie.
+- Integration tests — Python functions talking directly to PostgreSQL. Verify that data is correctly stored, updated, and deleted.
+- E2E tests — Playwright opens a real browser, fills forms, clicks buttons, and checks what the user sees. Also verifies the database state after UI actions.
+- CI/CD — GitHub Actions runs all tests automatically on every push to main.
 
-##  Struktura projektu
+##  Tech Stack
+- **Python 3.14**: Main language
+- **Docker & Docker Compose**: Web frontend (UI for E2E tests)
+- **Poetry**: Relational database
+- **PostgreSQL**: Runs PostgreSQL in a container
+- **Pytest**: Test runner and fixture management
+- **Psycopg2**: Python driver for PostgreSQL
+- **Playwright**: Dependency management
+- **GitHub Actions**: CI/CD pipeline
+  
+##  Project Structure
 
 ```text
-UNIVERSAL-STOREFRONT/
-├── src/                         			# Kod źródłowy aplikacji
-│   ├── database/                 			# Warstawa dostępu do danych (połączenie, zapytania SQL)
-│   │   ├── sql/                  			# Skrypty SQL (inicjalizacja bazy)
-│   │   │   └── schema.sql                  # Przykładowe dane startowe
-│   │   ├── database.py           			# Zarządzanie połączeniem z PostgreSQL
-│   │   └── db_utils.py           			# Narzędzia pomocnicze do operacji na bazie
-│   ├── __init__.py               			# Umożliwenie importu src/ między modułami
-│   ├── app.py                   			# Serwer Flask - (UI)
-│   └── application.py           			# Główne funkcje aplikacji
-├── tests/                       			# Folder testowy (Pytest)
-│   ├── database/                			# Testy integracyjne bazy danych
-│   │   ├── test_access.py             		# Testy logiki dostępów
-│   │   ├── test_movie.py         			# Testy logiki filmów
-│   │   └── test_user.py         			# Testy logiki użytkowników
-│   └── conftest.py             			# Konfiguracja i fixture'y dla testów
-├── .gitignore                   			# Pliki ignorowane przez Git
-├── docker-compose.yml           			# Definicja kontenera z bazą danych
-├── pyproject.toml               			# Konfiguracja Poetry i zależności
-└── README.md                    			# Dokumentacja projektu
+universal-storefront/
+├── .github/
+│   └── workflows/
+│       └── tests.yml            # GitHub Actions CI/CD pipeline
+├── src/
+│   ├── database/
+│   │   ├── sql/
+│   │   │   └── schema.sql       # Database schema (tables, constraints)
+│   │   ├── database.py          # DB connection management
+│   │   └── db_utils.py          # Helper utilities
+│   ├── static/
+│   │   └── style.css            # Frontend styles
+│   ├── templates/
+│   │   ├── login.html           # Login page
+│   │   ├── register.html        # Register page
+│   │   └── dashboard.html       # Dashboard page 
+│   ├── app.py                   # Flask application (routes, session management)
+│   └── application.py           # Business logic (users, movies, access control)
+├── tests/
+│   ├── conftest.py              # Shared fixture: database schema setup
+│   ├── database/
+│   │   ├── conftest.py          # DB fixture: connection + rollback after each test
+│   │   ├── test_user.py         # Integration tests: user registration, authentication, validation and profile management
+│   │   ├── test_movie.py        # Integration tests: movie catalog
+│   │   └── test_access.py       # Integration tests: PPV access + watch request logic
+│   └── e2e/
+│       ├── conftest.py          # E2E fixture: connection + TRUNCATE after each test
+│       ├── pages/
+│       │   ├── login_page.py    # Page Object: login page
+│       │   ├── register_page.py # Page Object: register page
+│       │   └── dashboard_page.py # Page Object: dashboard
+│       ├── test_register.py     # E2E: user registration flow
+│       ├── test_login.py        # E2E: login flow
+│       └── test_upgrade.py      # E2E: upgrade to premium + DB verification
+├── docker-compose.yml
+├── pyproject.toml
+└── README.md
 ```
 
 
-###  Schemat bazy danych
+###  Database Schema
 
 **Users**
 
@@ -84,33 +106,67 @@ UNIVERSAL-STOREFRONT/
 | `user_id + movie_id` | | UNIQUE | One access record per user per movie |
 
 
-##  Szybki Start
+##  Quick Start
 
-### 1. Wymagania wstępne
-Upewnij się, że masz zainstalowane:
+### 1. Requirements
 - Docker Desktop
-- Python 3.12+
+- Python 3.14
 - Poetry
 
-### 2. Instalacja i uruchomienie
-#### Sklonuj projekt
-git clone https://github.com/Sztachaprog/universal-storefront.git
+### 2. Setup
+#### Clone the repository
+- git clone https://github.com/Sztachaprog/universal-storefront.git
+- cd universal-storefront
 
-#### Zainstaluj biblioteki przez Poetry
-poetry install
+#### Install dependencies
+- poetry install
 
-#### Uruchom bazę danych w Dockerze
-docker-compose up -d
- 
-#### Uruchom wszystkie testy z logami w terminalu
-poetry run pytest -s
+#### Install Playwright browsers
+- poetry run playwright install chromium
+
+#### Start PostgreSQL
+- docker-compose up -d
+
+#### Run the Application
+- poetry run python -m flask --app src.app run --port 5000
+
+- Then open http://localhost:5000 in your browser
+
+### 3. Run Tests
+#### All tests
+- poetry run pytest tests
+
+#### Integration tests only
+- poetry run pytest tests/database
+
+#### E2E tests only (Flask must be running)
+- poetry run pytest tests/e2e
+
+#### E2E with visible browser
+- poetry run pytest tests/e2e --headed
 
 
+## CI/CD
+### GitHub Actions runs on every push to main:
 
-​ Rozwiązane problemy
+1. Starts a PostgreSQL container (port 5433)
+2. Installs Python 3.14 and Poetry
+3. Installs dependencies and Playwright browsers
+4. Runs integration tests
+5. Starts Flask in the background
+6. Runs E2E tests with headless Chromium
 
-​Port bazy danych: Projekt korzysta z portu 5433, aby uniknąć konfliktów z lokalnymi instalacjami PostgreSQL
+## Known Issues
 
+1. Port 5433 is used instead of default 5432 to avoid conflicts with local PostgreSQL installations.
+2. app.secret_key is hardcoded for development. In production, use an environment variable.
+
+## Status
+
+This project is actively developed. Planned additions:
+- API tests using Requests library
+- Allure Reports with screenshots on failure
+- Extended negative test scenarios (validation, edge cases)
 
 
 
