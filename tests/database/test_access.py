@@ -8,10 +8,10 @@ from src.application import (
 
 def test_grant_ppv_access(cursor):
     # Create a test user with non-premium access
-    non_premium_user_id = register_user("user", "password123", "mail@mail.com", is_premium=False, cursor=cursor)
+    non_premium_user_id = register_user("username", "password123", "mail@mail.com", is_premium=False, cursor=cursor)
 
     # Create a test user with premium access
-    premium_user_id = register_user("user2", "password123", "mail2@mail.com", is_premium=True, cursor=cursor)
+    premium_user_id = register_user("username2", "password123", "mail2@mail.com", is_premium=True, cursor=cursor)
     
 
     # Create a test movie that is premium only
@@ -27,11 +27,11 @@ def test_grant_ppv_access(cursor):
     
 def test_process_watch_request(cursor):
     # Create a test user with non-premium access
-    non_premium_user_id = register_user("user", "password123", "mail@mail.com", is_premium=False, cursor=cursor)
+    non_premium_user_id = register_user("username", "password123", "mail@mail.com", is_premium=False, cursor=cursor)
 
     
     # Create a test user with premium access
-    premium_user_id = register_user("user2", "password123", "mail2@mail.com", is_premium=True, cursor=cursor)
+    premium_user_id = register_user("username2", "password123", "mail2@mail.com", is_premium=True, cursor=cursor)
 
     # Create a test movie that is premium only
     movie_id = create_movie("2023-01-01", True, "en", "Premium Movie", "A premium movie description", cursor=cursor)
