@@ -6,6 +6,10 @@ from src.database.database import get_db_connection, close_db_connection
 def register_user(username, password, email, is_premium=False, cursor = None):
 
         query = "INSERT INTO users (username, password_hash, email, is_premium) VALUES (%s, %s, %s, %s) RETURNING id;"
+        if len(username) < 6:
+                raise ValueError("Username too short")
+        if not re.match(r'^[a-zA-Z0-9_]+$', username):
+                raise ValueError("Frobbiden chars")
         if len(password) < 8:
                 raise ValueError("Password too short")
         user_username = get_user_by_name(username, cursor=cursor)
