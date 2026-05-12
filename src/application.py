@@ -1,23 +1,24 @@
 from venv import logger
 import bcrypt
 from src.database.database import get_db_connection, close_db_connection
+import re
 
 # CREATE users
 def register_user(username, password, email, is_premium=False, cursor = None):
 
         query = "INSERT INTO users (username, password_hash, email, is_premium) VALUES (%s, %s, %s, %s) RETURNING id;"
         if len(username) < 6:
-                raise ValueError("Username too short")
+                raise ValueError("Username is too short")
         if not re.match(r'^[a-zA-Z0-9_]+$', username):
-                raise ValueError("Frobbiden chars")
+                raise ValueError("Forbidden characters in username")
         if len(password) < 8:
-                raise ValueError("Password too short")
+                raise ValueError("Password is too short")
         user_username = get_user_by_name(username, cursor=cursor)
         if user_username is not None:
-                raise ValueError("Username exist")
+                raise ValueError("Username already exists")
         user_mail = get_user_by_mail(email, cursor=cursor)
         if user_mail is not None:
-                raise ValueError("Email exist")
+                raise ValueError("Email already exists")
         byte_password = password.encode('utf-8')
         salt = bcrypt.gensalt()
         hashed_password = bcrypt.hashpw(byte_password, salt).decode('utf-8')
