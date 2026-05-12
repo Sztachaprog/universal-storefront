@@ -16,3 +16,6 @@ class LoginPage:
     
     def get_welcome_name(self):
         return self.page.locator(".welcome-name")
+    
+    def login_error(self):
+        return self.page.locator("#login-error")
