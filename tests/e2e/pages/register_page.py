@@ -19,3 +19,6 @@ class RegisterPage:
     
     def success_register(self):
         return self.page.locator("#register-success")
+    
+    def error_register(self):
+        return self.page.locator("#register-error")
