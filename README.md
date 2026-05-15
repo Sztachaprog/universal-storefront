@@ -10,12 +10,14 @@ The framework covers three layers of testing:
 
 ##  Tech Stack
 - **Python 3.14**: Main language
-- **Docker & Docker Compose**: Web frontend (UI for E2E tests)
-- **Poetry**: Relational database
-- **PostgreSQL**: Runs PostgreSQL in a container
-- **Pytest**: Test runner and fixture management
 - **Psycopg2**: Python driver for PostgreSQL
-- **Playwright**: Dependency management
+- **bcrypt**: Python driver hashing password
+- **Playwright**: Browser automation for E2E tests
+- **Docker & Docker Compose**: Runs PostgreSQL in a container
+- **Poetry**: Package manager
+- **PostgreSQL**: Relational database
+- **Pytest**: Test runner and fixture management
+- **allure**: Pytest reporting with screenshots on failure
 - **GitHub Actions**: CI/CD pipeline
   
 ##  Project Structure
@@ -156,10 +158,6 @@ universal-storefront/
 5. Starts Flask in the background
 6. Runs E2E tests with headless Chromium
 
-## Known Issues
-
-1. Port 5433 is used instead of default 5432 to avoid conflicts with local PostgreSQL installations.
-2. app.secret_key is hardcoded for development. In production, use an environment variable.
 
 ## Status
 
