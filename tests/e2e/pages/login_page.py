@@ -19,3 +19,9 @@ class LoginPage:
     
     def login_error(self):
         return self.page.locator("#login-error")
+    
+    def login(self, username, password):
+        self.navigate()
+        self.fill_username(username)
+        self.fill_password(password)
+        self.submit()

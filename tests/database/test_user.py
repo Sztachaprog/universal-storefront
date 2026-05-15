@@ -19,18 +19,26 @@ def test_create_user(cursor):
     user = cursor.fetchone()
     
     assert user is not None, "User not found in database."
-    assert user[0] == "username", f"Where looking for 'bartek', found '{user[0]}'"
+    assert user[0] == "username", f"Where looking for 'username', found '{user[0]}'"
     assert user[1] != "password", f"Different password than inputed '{user[1]}'"
-    assert user[2] == "user@example.com", f"Where looking for 'bartek@example.com', found '{user[2]}'"
+    assert user[2] == "user@example.com", f"Where looking for 'user@example.com', found '{user[2]}'"
     assert user[3] == True, f"Where looking for is_premium True, found {user[3]}"
 
 def test_too_short_password(cursor):
     with pytest.raises(ValueError):
-        register_user("username", "haslo", "bartek@example.com", is_premium=True, cursor=cursor) 
+        register_user("username", "haslo", "bartek@example.com", is_premium=False, cursor=cursor) 
 
 def test_too_short_username(cursor):
     with pytest.raises(ValueError):
-        register_user("user", "password", "bartek@example.com", is_premium=True, cursor=cursor) 
+        register_user("user", "password", "bartek@example.com", is_premium=False, cursor=cursor) 
+
+def test_too_long_username(cursor):
+    with pytest.raises(ValueError):
+        register_user("u"*31, "password", "user@example.com", is_premium=False, cursor=cursor)
+
+def test_too_long_password(cursor):
+    with pytest.raises(ValueError):
+        register_user("username", "p"*75, "user@example.com", is_premium=False, cursor=cursor)
 
 def test_duplicate_username(cursor):
     register_user("username1", "password", "user1@example.com", cursor = cursor)
@@ -53,7 +61,7 @@ def test_get_user_by_name(cursor):
     user = get_user_by_name("username", cursor)
 
     assert user is not None, "User not found in database"
-    assert user[1] == "username", f"Expected username 'user', got '{user[1]}'"
+    assert user[1] == "username", f"Expected username 'username', got '{user[1]}'"
     assert user[2] == "mail@mail.com", f"Expected email 'mail@mail.com', got '{user[2]}'"
     assert user[3] == False, f"Expected is_premium False, got {user[3]}"
 
@@ -62,7 +70,7 @@ def test_get_user_by_mail(cursor):
     user = get_user_by_mail("mail@mail.com", cursor = cursor)
 
     assert user is not None, "User not found in database"
-    assert user[1] == "username", f"Expected username 'user', got '{user[1]}'"
+    assert user[1] == "username", f"Expected username 'username', got '{user[1]}'"
     assert user[2] == "mail@mail.com", f"Expected email 'mail@mail.com', got '{user[2]}'"
     assert user[3] == False, f"Expected is_premium False, got {user[3]}"
 def test_get_user_by_id(cursor):
@@ -71,7 +79,7 @@ def test_get_user_by_id(cursor):
 
     assert user is not None, "User not found in database"
     assert user[0] == registered, f"Expected user ID {registered}, got '{user[0]}'"
-    assert user[1] == "username", f"Expected username 'user', got '{user[1]}'"
+    assert user[1] == "username", f"Expected username 'username', got '{user[1]}'"
     assert user[2] == "mail@mail.com", f"Expected email 'mail@mail.com', got '{user[2]}'"
     assert user[3] == False, f"Expected is_premium False, got {user[3]}"
 # Delete

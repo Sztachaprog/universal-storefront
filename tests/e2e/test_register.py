@@ -30,6 +30,17 @@ def test_too_short_username_register(page):
     
     expect(register_page.error_register()).to_have_text("Username is too short")
 
+def test_too_long_username_register(page):
+
+    register_page = RegisterPage(page)
+    register_page.navigate()
+    register_page.fill_username("u"*31)
+    register_page.fill_password("testpassword")
+    register_page.fill_email("testuser@mail.com")
+    register_page.submit()
+
+    expect(register_page.error_register()).to_have_text("Username is too long")
+
 def test_too_short_password_register(page):
 
     register_page = RegisterPage(page)
@@ -40,6 +51,17 @@ def test_too_short_password_register(page):
     register_page.submit()
     
     expect(register_page.error_register()).to_have_text("Password is too short")
+
+def test_too_long_password_register(page):
+
+    register_page = RegisterPage(page)
+    register_page.navigate()
+    register_page.fill_username("testusername")
+    register_page.fill_password("p"*75)
+    register_page.fill_email("testuser@mail.com")
+    register_page.submit()
+
+    expect(register_page.error_register()).to_have_text("Password is too long")
 
 
 def test_forbidden_characters_in_username_register(page):
