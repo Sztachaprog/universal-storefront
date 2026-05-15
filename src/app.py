@@ -84,7 +84,7 @@ def upgrade():
         conn = get_db_connection()
         cursor = conn.cursor()
         try:
-            user_id = request.form["user_id"]     
+            user_id = session["user_id"]   
             is_premium = get_user_by_id(user_id, cursor=cursor)
             if is_premium[3] is True:
                 return render_template("dashboard.html", error="already premium")              

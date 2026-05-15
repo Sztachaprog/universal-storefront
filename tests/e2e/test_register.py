@@ -1,6 +1,4 @@
-from playwright.sync_api import (
-    expect
-)
+from playwright.sync_api import expect
 from src.application import(
     register_user
 )
