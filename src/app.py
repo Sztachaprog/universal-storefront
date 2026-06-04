@@ -24,11 +24,16 @@ def home():
 
 @app.route("/dashboard")
 def dashboard():
-    return render_template("dashboard.html", 
-        username=session["username"],
-        is_premium=session["is_premium"],
-        user_id=session["user_id"]
-    )
+    if "username" in session:
+
+        return render_template("dashboard.html", 
+            username=session["username"],
+            is_premium=session["is_premium"],
+            user_id=session["user_id"]
+        )
+    else:
+        return redirect(url_for("login")) # if fail change url for /login
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
