@@ -9,6 +9,7 @@ class TestUser:
     username: str
     password: str
     email: str
+    is_premium: bool = False
 
 
 # pytest_runtest_setup — before test
@@ -57,5 +58,17 @@ def registered_user(cursor, conn):
         email="testuser@mail.com"
     )
     register_user(user.username, user.password, user.email, is_premium = False, cursor=cursor)
+    conn.commit()
+    return user
+
+@pytest.fixture(scope="function", autouse=False)
+def registered_user_with_premium(cursor, conn):
+    user = TestUser(
+        username="testusername", 
+        password="testpassword", 
+        email="testuser@mail.com",
+        is_premium= True
+    )
+    register_user(user.username, user.password, user.email, user.is_premium, cursor=cursor)
     conn.commit()
     return user
