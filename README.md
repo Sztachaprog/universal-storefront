@@ -163,7 +163,7 @@ universal-storefront/
 
 This project is actively developed. Planned additions:
 - API tests using Requests library
-- Allure Reports with screenshots on failure
+- Add /movies page
 - Extended negative test scenarios (validation, edge cases)
 
 
