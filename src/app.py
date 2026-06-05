@@ -25,7 +25,6 @@ def home():
 @app.route("/dashboard")
 def dashboard():
     if "username" in session:
-
         return render_template("dashboard.html", 
             username=session["username"],
             is_premium=session["is_premium"],
@@ -61,7 +60,12 @@ def login():
             close_db_connection(conn, cursor)
     return render_template("login.html", error=None, success=None)
 
-
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
+    
+    
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
