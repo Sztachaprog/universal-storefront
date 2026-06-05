@@ -7,6 +7,8 @@ class DashboardPage:
     
     def submit(self):
         self.page.click("#upgrade-btn")
+    def logout(self):
+        self.page.click("#logout-btn")
     def active_premium_status(self):
         return self.page.locator("#premium-status")
     
