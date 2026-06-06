@@ -112,7 +112,23 @@ if __name__ == "__main__":
 
 
 
-# API routes for tests
+# API routes for tests purpose
+
+@app.route("/api/users", methods=["POST"])
+def post_user_api():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        username = request.json["username"] 
+        password = request.json["password"]
+        email = request.json["email"]
+        register_user(username, password, email, is_premium=False, cursor = cursor)
+        conn.commit()
+        return jsonify({"message": "created"}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        close_db_connection(conn, cursor)
 
 @app.route("/api/users/<int:id>")
 def get_user_api(id):
