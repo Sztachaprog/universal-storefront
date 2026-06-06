@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, session, url_for
+from flask import Flask, request, render_template, redirect, session, url_for, jsonify
 
 from src.database.database import (
     get_db_connection,
@@ -12,7 +12,6 @@ get_user_password_hash,
 get_user_by_id
 )
 import bcrypt
-import psycopg2
 
 app = Flask(__name__)
 app.secret_key = "dev-secret-key"
@@ -110,3 +109,26 @@ def upgrade():
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
+
+
+
+# API routes for tests
+
+@app.route("/api/users/<int:id>")
+def get_user_api(id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        user = get_user_by_id(id, cursor=cursor)
+        if user is None:
+            return jsonify({"error": "User not found"}), 404
+        return jsonify({
+            "id": user[0],
+            "username": user[1],
+            "email": user[2],
+            "is_premium": user[3]
+        }), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        close_db_connection(conn, cursor)
