@@ -6,22 +6,39 @@ import re
 def register_user(username, password, email, is_premium=False, cursor = None):
 
         query = "INSERT INTO users (username, password_hash, email, is_premium) VALUES (%s, %s, %s, %s) RETURNING id;"
+
+        if username is None or username.strip() == "":
+                raise ValueError("Username is required")
+        
         if len(username) < 6:
                 raise ValueError("Username is too short")
+        
         if len(username) > 30:
                 raise ValueError("Username is too long")
+        
         if not re.match(r'^[a-zA-Z0-9_]+$', username):
                 raise ValueError("Forbidden characters in username")
+        
+        if email is None or email.strip() == "":
+                raise ValueError("Email is required")
+        
+        if len(email) > 255:
+                raise ValueError("Email is too long")
+        
         if len(password) < 8:
                 raise ValueError("Password is too short")
+        
         if len(password) > 74:
                 raise ValueError("Password is too long")
+        
         user_username = get_user_by_name(username, cursor=cursor)
         if user_username is not None:
                 raise ValueError("Username already exists")
+
         user_mail = get_user_by_mail(email, cursor=cursor)
         if user_mail is not None:
                 raise ValueError("Email already exists")
+        
         byte_password = password.encode('utf-8')
         salt = bcrypt.gensalt()
         hashed_password = bcrypt.hashpw(byte_password, salt).decode('utf-8')
