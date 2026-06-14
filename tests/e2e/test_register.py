@@ -2,10 +2,11 @@ from playwright.sync_api import expect
 from src.application import(
     register_user
 )
+import allure
 from tests.e2e.pages.register_page import RegisterPage
 
 
-
+@allure.feature("E2E Registration")
 def test_correct_register(page):
 
     register_page = RegisterPage(page)
@@ -16,7 +17,8 @@ def test_correct_register(page):
     register_page.submit()
     
     expect(register_page.success_register()).to_have_text("Succesfully registered")
-    
+
+@allure.feature("E2E Registration")
 def test_too_short_username_register(page):
 
     register_page = RegisterPage(page)
@@ -28,6 +30,7 @@ def test_too_short_username_register(page):
     
     expect(register_page.error_register()).to_have_text("Username is too short")
 
+@allure.feature("E2E Registration")
 def test_too_long_username_register(page):
 
     register_page = RegisterPage(page)
@@ -39,6 +42,7 @@ def test_too_long_username_register(page):
 
     expect(register_page.error_register()).to_have_text("Username is too long")
 
+@allure.feature("E2E Registration")
 def test_too_short_password_register(page):
 
     register_page = RegisterPage(page)
@@ -50,6 +54,7 @@ def test_too_short_password_register(page):
     
     expect(register_page.error_register()).to_have_text("Password is too short")
 
+@allure.feature("E2E Registration")
 def test_too_long_password_register(page):
 
     register_page = RegisterPage(page)
@@ -61,7 +66,7 @@ def test_too_long_password_register(page):
 
     expect(register_page.error_register()).to_have_text("Password is too long")
 
-
+@allure.feature("E2E Registration")
 def test_forbidden_characters_in_username_register(page):
 
     register_page = RegisterPage(page)
@@ -73,6 +78,7 @@ def test_forbidden_characters_in_username_register(page):
     
     expect(register_page.error_register()).to_have_text("Forbidden characters in username")
 
+@allure.feature("E2E Registration")
 def test_duplicate_username_register(page, registered_user):
 
     register_page = RegisterPage(page)
@@ -84,6 +90,7 @@ def test_duplicate_username_register(page, registered_user):
 
     expect(register_page.error_register()).to_have_text("Username already exists")
 
+@allure.feature("E2E Registration")
 def test_duplicate_email_register(page, registered_user):
 
     register_page = RegisterPage(page)

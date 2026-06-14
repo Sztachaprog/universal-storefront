@@ -4,8 +4,10 @@ from src.application import (
     update_movie,
     delete_movie
 )
+import allure
 
 # Create
+@allure.feature("Database Movie")
 def test_create_movie(cursor):
     movie_id = create_movie("2024-01-01", True, "pl", "Polski film", "Opis polskiego filmu", cursor = cursor)
     assert movie_id is not None, "Failed to create movie"
@@ -19,6 +21,7 @@ def test_create_movie(cursor):
     assert movie_details[4] == "Opis polskiego filmu", f"Expected description 'Opis polskiego filmu', got '{movie_details[4]}'"
 
 # Read
+@allure.feature("Database Movie")
 def test_get_movie(cursor):
     movie_id = create_movie("2024-01-01", True, "pl", "Polski film", "Opis polskiego filmu", cursor = cursor)
     movie_details = get_movie_details(movie_id, "pl", cursor = cursor)
@@ -28,7 +31,9 @@ def test_get_movie(cursor):
     assert movie_details[2] == True, f"Expected is_premium_only True, got {movie_details[2]}"
     assert movie_details[3] == "Polski film", f"Expected title 'Polski film', got '{movie_details[3]}'"
     assert movie_details[4] == "Opis polskiego filmu", f"Expected description 'Opis polskiego filmu', got '{movie_details[4]}'"
+
 # Update
+@allure.feature("Database Movie")
 def test_update_movie(cursor):
     movie_id = create_movie("2024-01-01", True, "pl", "Polski film", "Opis polskiego filmu", cursor = cursor)
     updated_movies = update_movie("2025-01-01", False, "en", "English Movie", "Description of English movie", movie_id, cursor = cursor)
@@ -39,7 +44,9 @@ def test_update_movie(cursor):
     assert get_updated_movies[2] == False, f"Expected is_premium_only False, got {get_updated_movies[2]}"
     assert get_updated_movies[3] == "English Movie", f"Expected title 'English Movie', got '{get_updated_movies[3]}'"
     assert get_updated_movies[4] == "Description of English movie", f"Expected description 'Description of English movie', got '{get_updated_movies[4]}'"
+
 # Delete
+@allure.feature("Database Movie")
 def test_delete_movie(cursor):
     movie_id = create_movie("2024-01-01", True, "pl", "Polski film", "Opis polskiego filmu", cursor = cursor)
     delete_movie(movie_id, cursor = cursor)

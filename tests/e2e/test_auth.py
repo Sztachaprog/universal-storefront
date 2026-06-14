@@ -3,8 +3,10 @@ from playwright.sync_api import (
 )
 from tests.e2e.pages.dashboard_page import DashboardPage
 from tests.e2e.pages.login_page import LoginPage
+import allure
 
 
+@allure.feature("E2E Authentication")
 def test_unauthorized_dashboard(page):
 
     dashboard = DashboardPage(page)
@@ -12,6 +14,7 @@ def test_unauthorized_dashboard(page):
 
     assert page.url == "http://localhost:5000/login", "Unauthorized user should be redirected to login page"
 
+@allure.feature("E2E Authentication")
 def test_logout_clear_session(page, registered_user):
 
     login_page = LoginPage(page)

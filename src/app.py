@@ -125,13 +125,13 @@ def post_user_api():
         register_user(username, password, email, is_premium=False, cursor = cursor)
         conn.commit()
         return jsonify({"message": "created"}), 201
-    except ValueError as e:
-        if "already exists" in str(e):
+    except ValueError as e:                             # to dokładniej co to
+        if "already exists" in str(e):                  # to tez 
             return jsonify({"error": str(e)}), 409
         return jsonify({"error": str(e)}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
+        
     finally:
         close_db_connection(conn, cursor)
 

@@ -7,9 +7,10 @@ from src.application import(
 )
 from tests.e2e.pages.login_page import LoginPage
 from tests.e2e.pages.dashboard_page import DashboardPage
+import allure
 
 
-
+@allure.feature("E2E Premium")
 def test_upgrade_to_premium(page, cursor, registered_user):
     
     login_page = LoginPage(page)
@@ -21,7 +22,8 @@ def test_upgrade_to_premium(page, cursor, registered_user):
     
     username = get_user_by_name(registered_user.username, cursor=cursor)
     assert username[3] == True, "Premium should be premium"
-    
+
+@allure.feature("E2E Premium")
 def test_already_upgraded_user(page, registered_user_with_premium):
 
     login_page = LoginPage(page)
