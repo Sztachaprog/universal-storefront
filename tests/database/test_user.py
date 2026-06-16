@@ -15,6 +15,7 @@ import allure
 
 #Create
 @allure.feature("Database User")
+@allure.story("Create User")
 def test_create_user(cursor):
     register_user("username", "password", "user@example.com", is_premium=True, cursor=cursor)
     cursor.execute("SELECT username, password_hash, email, is_premium FROM users WHERE username = 'username';")
@@ -27,26 +28,31 @@ def test_create_user(cursor):
     assert user[3] == True, f"Where looking for is_premium True, found {user[3]}"
 
 @allure.feature("Database User")
+@allure.story("Create User")
 def test_too_short_password(cursor):
     with pytest.raises(ValueError):
         register_user("username", "haslo", "bartek@example.com", is_premium=False, cursor=cursor) 
 
 @allure.feature("Database User")
+@allure.story("Create User")
 def test_too_short_username(cursor):
     with pytest.raises(ValueError):
         register_user("user", "password", "bartek@example.com", is_premium=False, cursor=cursor) 
 
 @allure.feature("Database User")
+@allure.story("Create User")
 def test_too_long_username(cursor):
     with pytest.raises(ValueError):
         register_user("u"*31, "password", "user@example.com", is_premium=False, cursor=cursor)
 
 @allure.feature("Database User")
+@allure.story("Create User")
 def test_too_long_password(cursor):
     with pytest.raises(ValueError):
         register_user("username", "p"*75, "user@example.com", is_premium=False, cursor=cursor)
 
 @allure.feature("Database User")
+@allure.story("Create User")
 def test_duplicate_username(cursor):
     register_user("username1", "password", "user1@example.com", cursor = cursor)
 
@@ -54,6 +60,7 @@ def test_duplicate_username(cursor):
         register_user("username1", "password", "user2@example.com", is_premium=True, cursor = cursor)
 
 @allure.feature("Database User")
+@allure.story("Create User")
 def test_duplicate_email(cursor):
     register_user("username1", "password", "user1@example.com", cursor = cursor)
 
@@ -61,12 +68,14 @@ def test_duplicate_email(cursor):
         register_user("username2", "password", "user1@example.com", is_premium=True, cursor = cursor)
         
 @allure.feature("Database User")
+@allure.story("Create User")
 def test_special_chars(cursor):
     with pytest.raises(ValueError):
         register_user("miha!!.", "password", "user1@example.com", cursor = cursor)
 
 # Read
 @allure.feature("Database User")
+@allure.story("Get User")
 def test_get_user_by_name(cursor):
     register_user("username", "password123", "mail@mail.com", cursor = cursor)
     user = get_user_by_name("username", cursor)
@@ -77,6 +86,7 @@ def test_get_user_by_name(cursor):
     assert user[3] == False, f"Expected is_premium False, got {user[3]}"
 
 @allure.feature("Database User")
+@allure.story("Get User")
 def test_get_user_by_mail(cursor):
     register_user("username", "password123", "mail@mail.com", cursor = cursor)
     user = get_user_by_mail("mail@mail.com", cursor = cursor)
@@ -87,6 +97,7 @@ def test_get_user_by_mail(cursor):
     assert user[3] == False, f"Expected is_premium False, got {user[3]}"
 
 @allure.feature("Database User")
+@allure.story("Get User")
 def test_get_user_by_id(cursor):
     registered = register_user("username", "password123", "mail@mail.com", cursor = cursor)
     user = get_user_by_id(registered, cursor = cursor)
@@ -99,6 +110,7 @@ def test_get_user_by_id(cursor):
     
 # Delete
 @allure.feature("Database User")
+@allure.story("Delete User")
 def test_delete_user(cursor):
     user_id = register_user("username", "password123", "mail@mail.com", cursor = cursor)
     delete_user(user_id, cursor = cursor)
@@ -109,6 +121,7 @@ def test_delete_user(cursor):
 
 # Update
 @allure.feature("Database User")
+@allure.story("Update User")
 def test_update_user(cursor):
     user_id = register_user("username", "password123", "mail@mail.com", is_premium=True, cursor = cursor)
     update_user_profile(user_id, "username2", "maill@mail.com", is_premium=False, cursor = cursor)
@@ -117,6 +130,7 @@ def test_update_user(cursor):
     assert user[1] == "username2", f"Expected updated username2 = username, got '{user[1]}'"
 
 @allure.feature("Database User")
+@allure.story("Update User")
 def test_update_user_password(cursor):
     user_id = register_user("username", "password123", "mail@mail.com", cursor = cursor)
     old_password = get_user_password_hash(user_id, cursor = cursor)
@@ -126,6 +140,7 @@ def test_update_user_password(cursor):
     assert old_password != new_password, "Password hash should be different after updated"
 
 @allure.feature("Database User")
+@allure.story("Upgrade User")
 def test_upgrade_user_to_premium(cursor):
     non_premium_user = register_user("username", "password123", "mail@mail.com", cursor = cursor)
     upgrade_user_to_premium(non_premium_user, cursor = cursor)

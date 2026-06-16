@@ -7,6 +7,7 @@ import allure
 
 
 @allure.feature("E2E Authentication")
+@allure.story("Unauthorized access")
 def test_unauthorized_dashboard(page):
 
     dashboard = DashboardPage(page)
@@ -15,6 +16,7 @@ def test_unauthorized_dashboard(page):
     assert page.url == "http://localhost:5000/login", "Unauthorized user should be redirected to login page"
 
 @allure.feature("E2E Authentication")
+@allure.story("Session Management")
 def test_logout_clear_session(page, registered_user):
 
     login_page = LoginPage(page)

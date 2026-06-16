@@ -11,6 +11,7 @@ import allure
 
 
 @allure.feature("E2E Premium")
+@allure.story("Upgrade to Premium")
 def test_upgrade_to_premium(page, cursor, registered_user):
     
     login_page = LoginPage(page)
@@ -24,6 +25,7 @@ def test_upgrade_to_premium(page, cursor, registered_user):
     assert username[3] == True, "Premium should be premium"
 
 @allure.feature("E2E Premium")
+@allure.story("Upgrade duplicate")
 def test_already_upgraded_user(page, registered_user_with_premium):
 
     login_page = LoginPage(page)

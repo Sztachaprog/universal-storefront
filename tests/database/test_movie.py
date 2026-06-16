@@ -8,6 +8,7 @@ import allure
 
 # Create
 @allure.feature("Database Movie")
+@allure.story("Create Movie")
 def test_create_movie(cursor):
     movie_id = create_movie("2024-01-01", True, "pl", "Polski film", "Opis polskiego filmu", cursor = cursor)
     assert movie_id is not None, "Failed to create movie"
@@ -22,6 +23,7 @@ def test_create_movie(cursor):
 
 # Read
 @allure.feature("Database Movie")
+@allure.story("Get Movie")
 def test_get_movie(cursor):
     movie_id = create_movie("2024-01-01", True, "pl", "Polski film", "Opis polskiego filmu", cursor = cursor)
     movie_details = get_movie_details(movie_id, "pl", cursor = cursor)
@@ -34,6 +36,7 @@ def test_get_movie(cursor):
 
 # Update
 @allure.feature("Database Movie")
+@allure.story("Update Movie")
 def test_update_movie(cursor):
     movie_id = create_movie("2024-01-01", True, "pl", "Polski film", "Opis polskiego filmu", cursor = cursor)
     updated_movies = update_movie("2025-01-01", False, "en", "English Movie", "Description of English movie", movie_id, cursor = cursor)
@@ -47,6 +50,7 @@ def test_update_movie(cursor):
 
 # Delete
 @allure.feature("Database Movie")
+@allure.story("Delete Movie")
 def test_delete_movie(cursor):
     movie_id = create_movie("2024-01-01", True, "pl", "Polski film", "Opis polskiego filmu", cursor = cursor)
     delete_movie(movie_id, cursor = cursor)

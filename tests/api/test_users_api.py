@@ -6,6 +6,7 @@ import requests
 import allure
 
 @allure.feature("API Users")
+@allure.story("GET User")
 def test_api_get_user(cursor, conn):
 
    register_user("username1", "password1", "bartek@example.com", is_premium=False, cursor=cursor)
@@ -18,6 +19,7 @@ def test_api_get_user(cursor, conn):
 
 
 @allure.feature("API Users")
+@allure.story("GET User")
 def test_api_get_non_exist_user():
 
    response = requests.get("http://localhost:5000/api/users/1")
@@ -25,6 +27,7 @@ def test_api_get_non_exist_user():
    assert response.status_code == 404, "User should not be found"
 
 @allure.feature("API Users")
+@allure.story("POST User")
 def test_api_post_user(cursor, conn):
 
    response = requests.post("http://localhost:5000/api/users", json={
@@ -40,6 +43,7 @@ def test_api_post_user(cursor, conn):
    assert response.status_code == 201, "User should be added to database"
 
 @allure.feature("API Users")
+@allure.story("POST User")
 def test_api_post_duplicate_username(cursor, conn):
 
    register_user("username1", "password1", "bartek@example.com", is_premium=False, cursor=cursor)
@@ -56,6 +60,7 @@ def test_api_post_duplicate_username(cursor, conn):
    assert duplicateResponse.status_code == 409, f"Respone should be 409 'Conflict', got {duplicateResponse.status_code}"
 
 @allure.feature("API Users")
+@allure.story("POST User")
 def test_api_post_without_email():
 
    response = requests.post("http://localhost:5000/api/users", json={
@@ -70,6 +75,7 @@ def test_api_post_without_email():
    assert response.status_code == 400, f"Respone should be 400 'Bad Request', got {response.status_code}"
 
 @allure.feature("API Users")
+@allure.story("POST User")
 def test_api_post_too_short_password():   
    
    response = requests.post("http://localhost:5000/api/users", json={

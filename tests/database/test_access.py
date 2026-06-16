@@ -8,6 +8,7 @@ import allure
 
 
 @allure.feature("Database Access")
+@allure.story("Access Control")
 def test_grant_ppv_access(cursor):
     # Create a test user with non-premium access
     non_premium_user_id = register_user("username", "password123", "mail@mail.com", is_premium=False, cursor=cursor)
@@ -27,6 +28,7 @@ def test_grant_ppv_access(cursor):
     assert user_premium_granted[0] == False, "PPV access should not be granted to the premium user who already has access"
 
 @allure.feature("Database Access")
+@allure.story("Access Control")
 def test_process_watch_request(cursor):
     # Create a test user with non-premium access
     non_premium_user_id = register_user("username", "password123", "mail@mail.com", is_premium=False, cursor=cursor)
