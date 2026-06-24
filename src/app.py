@@ -153,3 +153,24 @@ def get_user_api(id):
         return jsonify({"error": str(e)}), 500
     finally:
         close_db_connection(conn, cursor)
+
+@app.route("/api/login", methods=["POST"])
+def post_login_api():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try: 
+        username = request.json["username"] 
+        password = request.json["password"] 
+        user = get_user_by_name(username, cursor=cursor)
+        if user is None:
+            return jsonify({"error": "Invalid credentials"}), 401
+        stored_hash = get_user_password_hash(user[0], cursor=cursor)
+            
+        if bcrypt.checkpw(password.encode("utf-8"), stored_hash.encode("utf-8")):
+            return jsonify({"message": "ok"}), 200
+        return jsonify({"error": "Invalid credentials"}), 401
+                   
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        close_db_connection(conn, cursor)
