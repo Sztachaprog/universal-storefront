@@ -1,4 +1,6 @@
 from flask import Flask, request, render_template, redirect, session, url_for, jsonify
+from datetime import datetime, timedelta, timezone
+from functools import wraps
 
 from src.database.database import (
     get_db_connection,
@@ -14,8 +16,36 @@ get_user_by_id
 import bcrypt
 import jwt
 
+
 app = Flask(__name__)
 app.secret_key = "dev-secret-key"
+
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):                         # * Catch somany arguments as is given, ** catch somany arguments with name as is given
+        token = None
+        auth_header = request.headers.get("Authorization")
+        if auth_header:
+            token = auth_header.split(" ")[1]   # "Bearer <token>" -> bierze sam token
+
+        if not token:
+            return jsonify({"error": "Token is missing"}), 401
+
+        try:
+            payload = jwt.decode(token, app.secret_key, algorithms=["HS256"])
+            current_user_id = payload["user_id"]
+        except jwt.ExpiredSignatureError:
+            return jsonify({"error": "Token expired"}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({"error": "Invalid token"}), 401
+
+        return f(current_user_id, *args, **kwargs)
+    return decorated
+
+
+
+
 
 
 @app.route("/")
@@ -137,7 +167,8 @@ def post_user_api():
         close_db_connection(conn, cursor)
 
 @app.route("/api/users/<int:id>")
-def get_user_api(id):
+@token_required
+def get_user_api(current_user_id, id):
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
@@ -160,20 +191,25 @@ def post_login_api():
     conn = get_db_connection()
     cursor = conn.cursor()
     try: 
-        username = request.json["username"] 
+        username = request.json["username"]                                             # Send json with login and password
         password = request.json["password"] 
         user = get_user_by_name(username, cursor=cursor)
         if user is None:
             return jsonify({"error": "Invalid credentials"}), 401
         stored_hash = get_user_password_hash(user[0], cursor=cursor)
             
-        if bcrypt.checkpw(password.encode("utf-8"), stored_hash.encode("utf-8")):
-            payload = {"user_id": user[0]}
-            token = jwt.encode(payload, app.secret_key, "HS256")
-            return jsonify({"token": token}), 200
+        if bcrypt.checkpw(password.encode("utf-8"), stored_hash.encode("utf-8")):       # Check if hashed codes are the same
+            payload = {"user_id": user[0],                          
+                       "exp": datetime.now(timezone.utc) + timedelta(minutes=15)        # payload - insert into token data with user_id and existing time
+            }
+            token = jwt.encode(payload, app.secret_key, "HS256")                        # Create token with playload data and add secret_key of app with HS256 signing 
+            return jsonify({"token": token}), 200                                       # Return token to a user
         return jsonify({"error": "Invalid credentials"}), 401
                    
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     finally:
         close_db_connection(conn, cursor)
+
+
+
