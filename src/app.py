@@ -12,6 +12,7 @@ get_user_password_hash,
 get_user_by_id
 )
 import bcrypt
+import jwt
 
 app = Flask(__name__)
 app.secret_key = "dev-secret-key"
@@ -167,7 +168,9 @@ def post_login_api():
         stored_hash = get_user_password_hash(user[0], cursor=cursor)
             
         if bcrypt.checkpw(password.encode("utf-8"), stored_hash.encode("utf-8")):
-            return jsonify({"message": "ok"}), 200
+            payload = {"user_id": user[0]}
+            token = jwt.encode(payload, app.secret_key, "HS256")
+            return jsonify({"token": token}), 200
         return jsonify({"error": "Invalid credentials"}), 401
                    
     except Exception as e:
