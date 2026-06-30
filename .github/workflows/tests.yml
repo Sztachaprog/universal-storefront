@@ -51,5 +51,8 @@ jobs:
       - name: Wait for Flask
         run: sleep 3
 
+      - name: Run API tests
+        run: poetry run pytest tests/api
+
       - name: Run E2E tests
         run: poetry run pytest tests/e2e
