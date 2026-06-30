@@ -1,6 +1,6 @@
 from src.application import (
     register_user,
-    get_user_by_id
+    get_user_by_name
 )
 import requests
 import allure
@@ -11,7 +11,7 @@ from datetime import datetime, timezone, timedelta
 @allure.story("GET User")
 def test_api_get_user(cursor, conn):
 
-   register_user("username1", "password1", "bartek@example.com", is_premium=False, cursor=cursor)
+   user_id = register_user("username1", "password1", "bartek@example.com", is_premium=False, cursor=cursor)
    conn.commit()
    login = requests.post("http://localhost:5000/api/login", json={
                         "username": "username1",
@@ -19,7 +19,7 @@ def test_api_get_user(cursor, conn):
    })
    token = login.json()["token"]
    response = requests.get(
-   "http://localhost:5000/api/users/1",
+   f"http://localhost:5000/api/users/{user_id}",
    headers={"Authorization": f"Bearer {token}"}
    )
    data = response.json()
@@ -52,7 +52,7 @@ def test_api_post_user(cursor, conn):
        "email": "bartek@example.com"
    })
    conn.commit()
-   user = get_user_by_id(1, cursor=cursor)
+   user = get_user_by_name("username1", cursor=cursor)
 
    assert user is not None, "User should be added to database"
    assert response.status_code == 201, f"User should be added to database, got status code: {response.status_code}"
@@ -103,14 +103,14 @@ def test_api_post_too_short_password():
 @allure.story("Authentication")
 def test_api_token_expired(conn, cursor):
 
-      register_user("username1", "password1", "bartek@example.com", is_premium=False, cursor=cursor)
+      user_id = register_user("username1", "password1", "bartek@example.com", is_premium=False, cursor=cursor)
       conn.commit()
       expired_token = jwt.encode(
       {"user_id": 1, "exp": datetime.now(timezone.utc) - timedelta(minutes=1)},
       "dev-secret-key",
       algorithm="HS256"
    )
-      response = requests.get("http://localhost:5000/api/users/1",
+      response = requests.get(f"http://localhost:5000/api/users/{user_id}",
                               headers={"Authorization": f"Bearer {expired_token}"}
    )
       
