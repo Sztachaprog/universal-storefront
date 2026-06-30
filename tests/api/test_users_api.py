@@ -4,6 +4,8 @@ from src.application import (
 )
 import requests
 import allure
+import jwt
+from datetime import datetime, timezone, timedelta
 
 @allure.feature("API Users")
 @allure.story("GET User")
@@ -86,3 +88,40 @@ def test_api_post_too_short_password():
    })
 
    assert response.status_code == 400, f"Response should be 400 'Bad Request', got {response.status_code}"
+
+@allure.feature("API Users")
+@allure.story("AUTH")
+def test_api_token_expired(conn, cursor):
+
+      register_user("username1", "password1", "bartek@example.com", is_premium=False, cursor=cursor)
+      conn.commit()
+      expired_token = jwt.encode(
+      {"user_id": 1, "exp": datetime.now(timezone.utc) - timedelta(minutes=1)},
+      "dev-secret-key",
+      algorithm="HS256"
+   )
+      response = requests.get("http://localhost:5000/api/users/1",
+                              headers={"Authorization": f"Bearer {expired_token}"}
+   )
+      
+      assert response.status_code == 401, f"Session should be expired, got status code: {response.status_code}"
+      assert response.json()["error"] == "Token expired"
+
+@allure.feature("API Users")
+@allure.story("AUTH")
+def test_api_token_invalid():
+
+   Invalid_token = jwt.encode(
+      {"user_id": 1, "exp": datetime.now(timezone.utc) + timedelta(minutes=15)},
+      "wrong-key",
+      algorithm="HS256"
+   )
+
+   response = requests.get("http://localhost:5000/api/users/1",
+   headers={"Authorization": f"Bearer {Invalid_token}"
+   })
+
+
+   assert response.status_code == 401, f"got {response.status_code}"
+   assert response.json()["error"] == "Invalid token"
+
