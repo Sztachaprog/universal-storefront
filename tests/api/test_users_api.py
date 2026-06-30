@@ -90,7 +90,7 @@ def test_api_post_too_short_password():
    assert response.status_code == 400, f"Response should be 400 'Bad Request', got {response.status_code}"
 
 @allure.feature("API Users")
-@allure.story("AUTH")
+@allure.story("Authentication")
 def test_api_token_expired(conn, cursor):
 
       register_user("username1", "password1", "bartek@example.com", is_premium=False, cursor=cursor)
@@ -108,8 +108,8 @@ def test_api_token_expired(conn, cursor):
       assert response.json()["error"] == "Token expired"
 
 @allure.feature("API Users")
-@allure.story("AUTH")
-def test_api_token_invalid():
+@allure.story("Authentication")
+def test_api_token_missing():
 
    Invalid_token = jwt.encode(
       {"user_id": 1, "exp": datetime.now(timezone.utc) + timedelta(minutes=15)},
@@ -125,3 +125,12 @@ def test_api_token_invalid():
    assert response.status_code == 401, f"got {response.status_code}"
    assert response.json()["error"] == "Invalid token"
 
+
+@allure.feature("API Users")
+@allure.feature("Authentication")
+def test_api_token_missing():
+
+   response = requests.get("http://localhost:5000/api/users/1")
+
+   assert response.status_code == 401, f""
+   assert response.json()["error"] == "Token is missing"
