@@ -1,25 +1,26 @@
 from src.application import (
     register_user,
-    get_user_by_id
+    get_user_by_name
 )
 import requests
 import allure
 import jwt
 from datetime import datetime, timezone, timedelta
+from tests.api.conftest import BASE_URL
 
 @allure.feature("API Users")
 @allure.story("GET User")
 def test_api_get_user(cursor, conn):
 
-   register_user("username1", "password1", "bartek@example.com", is_premium=False, cursor=cursor)
+   user_id = register_user("username1", "password1", "bartek@example.com", is_premium=False, cursor=cursor)
    conn.commit()
-   login = requests.post("http://localhost:5000/api/login", json={
+   login = requests.post(f"{BASE_URL}/login", json={
                         "username": "username1",
                         "password": "password1"
    })
    token = login.json()["token"]
    response = requests.get(
-   "http://localhost:5000/api/users/1",
+   f"{BASE_URL}/users/{user_id}",
    headers={"Authorization": f"Bearer {token}"}
    )
    data = response.json()
@@ -36,7 +37,7 @@ def test_api_get_non_exist_user():
       {"user_id": 1, "exp": datetime.now(timezone.utc) + timedelta(minutes=15)},
       "dev-secret-key",
       algorithm="HS256")
-   response = requests.get("http://localhost:5000/api/users/1",
+   response = requests.get(f"{BASE_URL}/users/1",
                            headers={"Authorization": f"Bearer {token}"}
    )
 
@@ -46,13 +47,13 @@ def test_api_get_non_exist_user():
 @allure.story("POST User")
 def test_api_post_user(cursor, conn):
 
-   response = requests.post("http://localhost:5000/api/users", json={
+   response = requests.post(f"{BASE_URL}/users", json={
        "username": "username1",
        "password": "password1",
        "email": "bartek@example.com"
    })
    conn.commit()
-   user = get_user_by_id(1, cursor=cursor)
+   user = get_user_by_name("username1", cursor=cursor)
 
    assert user is not None, "User should be added to database"
    assert response.status_code == 201, f"User should be added to database, got status code: {response.status_code}"
@@ -64,7 +65,7 @@ def test_api_post_duplicate_username(cursor, conn):
    register_user("username1", "password1", "bartek@example.com", is_premium=False, cursor=cursor)
    conn.commit()
 
-   duplicateResponse = requests.post("http://localhost:5000/api/users", json={
+   duplicateResponse = requests.post(f"{BASE_URL}/users", json={
    "username": "username1",
    "password": "password123",
    "email": "test@example.com"
@@ -77,7 +78,7 @@ def test_api_post_duplicate_username(cursor, conn):
 @allure.story("POST User")
 def test_api_post_without_email():
 
-   response = requests.post("http://localhost:5000/api/users", json={
+   response = requests.post(f"{BASE_URL}/users", json={
    "username": "username1",
    "password": "password123",
    "email": ""
@@ -91,7 +92,7 @@ def test_api_post_without_email():
 @allure.story("POST User")
 def test_api_post_too_short_password():   
    
-   response = requests.post("http://localhost:5000/api/users", json={
+   response = requests.post(f"{BASE_URL}/users", json={
    "username": "username1",
    "password": "123",
    "email": "test@example.com"
@@ -103,14 +104,14 @@ def test_api_post_too_short_password():
 @allure.story("Authentication")
 def test_api_token_expired(conn, cursor):
 
-      register_user("username1", "password1", "bartek@example.com", is_premium=False, cursor=cursor)
+      user_id = register_user("username1", "password1", "bartek@example.com", is_premium=False, cursor=cursor)
       conn.commit()
       expired_token = jwt.encode(
       {"user_id": 1, "exp": datetime.now(timezone.utc) - timedelta(minutes=1)},
       "dev-secret-key",
       algorithm="HS256"
    )
-      response = requests.get("http://localhost:5000/api/users/1",
+      response = requests.get(f"{BASE_URL}/users/{user_id}",
                               headers={"Authorization": f"Bearer {expired_token}"}
    )
       
@@ -127,7 +128,7 @@ def test_api_token_invalid():
       algorithm="HS256"
    )
 
-   response = requests.get("http://localhost:5000/api/users/1",
+   response = requests.get(f"{BASE_URL}/users/1",
    headers={"Authorization": f"Bearer {invalid_token}"
    })
 
@@ -139,7 +140,7 @@ def test_api_token_invalid():
 @allure.story("Authentication")
 def test_api_token_missing():
 
-   response = requests.get("http://localhost:5000/api/users/1")
+   response = requests.get(f"{BASE_URL}/users/1")
 
    assert response.status_code == 401, f"Token should be missing '401', got status code: {response.status_code} "
    assert response.json()["error"] == "Token is missing"
