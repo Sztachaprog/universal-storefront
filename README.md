@@ -7,15 +7,19 @@ The framework covers three layers of testing:
 - Integration tests — Python functions talking directly to PostgreSQL. Verify that data is correctly stored, updated, and deleted.
 - E2E tests — Playwright opens a real browser, fills forms, clicks buttons, and checks what the user sees. Also verifies the database state after UI actions.
 - CI/CD — GitHub Actions runs all tests automatically on every push to main.
+- API tests — Requests library hits REST endpoints directly. Verifies status codes, JSON structure, and JWT authentication.
 
 ##  Tech Stack
 - **Python 3.14**: Main language
 - **Psycopg2**: Python driver for PostgreSQL
-- **bcrypt**: Python driver hashing password
+- **bcrypt**: Password hashing
+- **PyJWT**: JWT token generation and validation
+- **Requests**: HTTP client for API tests
 - **Playwright**: Browser automation for E2E tests
 - **Docker & Docker Compose**: Runs PostgreSQL in a container
 - **Poetry**: Package manager
 - **PostgreSQL**: Relational database
+- **Flask**: Web framework
 - **Pytest**: Test runner and fixture management
 - **allure**: Pytest reporting with screenshots on failure
 - **GitHub Actions**: CI/CD pipeline
@@ -43,6 +47,9 @@ universal-storefront/
 │   └── application.py           # Business logic (users, movies, access control)
 ├── tests/
 │   ├── conftest.py              # Shared fixture: database schema setup
+│   ├── api/
+│   │   ├── conftest.py          # DB fixture: connection + TRUNCATE after each test
+│   │   └── test_users_api.py    # API tests: CRUD + JWT auth scenarios
 │   ├── database/
 │   │   ├── conftest.py          # DB fixture: connection + rollback after each test
 │   │   ├── test_user.py         # Integration tests: user registration, authentication, validation and profile management
@@ -54,6 +61,7 @@ universal-storefront/
 │       │   ├── login_page.py    # Page Object: login page
 │       │   ├── register_page.py # Page Object: register page
 │       │   └── dashboard_page.py # Page Object: dashboard
+│       ├── test_auth.py         # E2E: authentication flow
 │       ├── test_register.py     # E2E: user registration flow
 │       ├── test_login.py        # E2E: login flow
 │       └── test_upgrade.py      # E2E: upgrade to premium + DB verification
@@ -114,6 +122,7 @@ universal-storefront/
 - Docker Desktop
 - Python 3.14
 - Poetry
+- Allure 
 
 ### 2. Setup
 #### Clone the repository
@@ -125,6 +134,13 @@ universal-storefront/
 
 #### Install Playwright browsers
 - poetry run playwright install chromium
+
+#### Install Allure CLI (for test reports)
+   Windows (scoop):
+   - scoop install allure
+  
+  macOS (brew):
+   - brew install allure
 
 #### Start PostgreSQL
 - docker-compose up -d
@@ -144,8 +160,18 @@ universal-storefront/
 #### E2E tests only (Flask must be running)
 - poetry run pytest tests/e2e
 
-#### E2E with visible browser
+#### E2E with visible browser (Flask must be running)
 - poetry run pytest tests/e2e --headed
+
+#### API tests only (Flask must be running)
+- poetry run pytest tests/api
+
+### 4. Test Reports (Allure)
+#### Generate results while running tests:
+- poetry run pytest tests --alluredir=allure-results
+
+#### Open the report:
+- allure serve allure-results
 
 
 ## CI/CD
@@ -156,15 +182,16 @@ universal-storefront/
 3. Installs dependencies and Playwright browsers
 4. Runs integration tests
 5. Starts Flask in the background
-6. Runs E2E tests with headless Chromium
+6. Runs API tests
+7. Runs E2E tests with headless Chromium
 
 
 ## Status
 
 This project is actively developed. Planned additions:
-- API tests using Requests library
 - Add /movies page
-- Extended negative test scenarios (validation, edge cases)
+- Extended API, E2E tests
+- Add mobile tests
 
 
 
