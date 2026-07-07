@@ -11,7 +11,10 @@ register_user,
 get_user_by_name, 
 upgrade_user_to_premium, 
 get_user_password_hash,
-get_user_by_id
+get_user_by_id,
+get_movie_by_id,
+get_movie_details,
+create_movie
 )
 import bcrypt
 import jwt
@@ -156,23 +159,25 @@ def post_user_api():
         register_user(username, password, email, is_premium=False, cursor = cursor)
         conn.commit()
         return jsonify({"message": "created"}), 201
-    except ValueError as e:                             # to dokładniej co to
-        if "already exists" in str(e):                  # to tez 
+    except ValueError as e:                             # catch ValueError thrown by register_user
+        if "already exists" in str(e):                  # check if error message text contains 'already exists'
             return jsonify({"error": str(e)}), 409
         return jsonify({"error": str(e)}), 400
-    except Exception as e:
+    except Exception as e:                              # Every error else
         return jsonify({"error": str(e)}), 500
         
     finally:
         close_db_connection(conn, cursor)
 
-@app.route("/api/users/<int:id>")
+@app.route("/api/users/<int:id>") # change logic for users/profile
 @token_required
 def get_user_api(current_user_id, id):
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
         user = get_user_by_id(id, cursor=cursor)
+        if current_user_id != id:
+            return jsonify({"error": "Unauthorized access"}), 403
         if user is None:
             return jsonify({"error": "User not found"}), 404
         return jsonify({
@@ -210,6 +215,10 @@ def post_login_api():
         return jsonify({"error": str(e)}), 500
     finally:
         close_db_connection(conn, cursor)
+
+@app.route("/api/movies/<int:id>/watch")
+def get_process_watch_request(current_user_id, movie_id):
+    
 
 
 
