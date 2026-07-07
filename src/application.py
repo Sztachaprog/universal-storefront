@@ -120,6 +120,11 @@ def get_movie_details(movie_id, language_code, cursor = None):
         movie = cursor.fetchone()
         return movie
 
+def get_movie_by_id(movie_id, cursor = None):
+        cursor.execute("SELECT id, release_date, is_premium_only FROM movies WHERE id = %s;", (movie_id,))
+        movie = cursor.fetchone()
+        return movie
+
 # UPDATE movies
 def update_movie(release_date, is_premium_only, language_code, title, description, movie_id, cursor = None):
 
