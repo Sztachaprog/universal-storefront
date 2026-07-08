@@ -14,7 +14,8 @@ get_user_password_hash,
 get_user_by_id,
 get_movie_by_id,
 get_movie_details,
-create_movie
+create_movie,
+process_watch_request
 )
 import bcrypt
 import jwt
@@ -169,7 +170,7 @@ def post_user_api():
     finally:
         close_db_connection(conn, cursor)
 
-@app.route("/api/users/<int:id>") # change logic for users/profile
+@app.route("/api/users/<int:id>") # TO DO change logic for users/profile
 @token_required
 def get_user_api(current_user_id, id):
     conn = get_db_connection()
@@ -216,9 +217,26 @@ def post_login_api():
     finally:
         close_db_connection(conn, cursor)
 
-@app.route("/api/movies/<int:id>/watch")
-def get_process_watch_request(current_user_id, movie_id):
-    
+@app.route("/api/movies/<int:movie_id>/watch")
+@token_required
+def watch_movie_api(current_user_id, movie_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:        
+        movie = get_movie_by_id(movie_id, cursor = cursor)
+        if movie is None:
+            return jsonify({"error": "Movie not found"}), 404
+        result = process_watch_request(current_user_id, movie_id, cursor = cursor)
+        if result:
+            return jsonify({"message": "Access granted"}), 200
+        else:
+            return jsonify({"error": "Access denied. Upgrade to premium or buy ppv to watch this movie."}), 403
+                
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        close_db_connection(conn, cursor)
+
 
 
 
