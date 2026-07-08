@@ -20,11 +20,7 @@ def test_api_get_user(cursor, conn):
    })
    token = login.json()["token"]
    response = requests.get(
-<<<<<<< HEAD
    f"{BASE_URL}/users/{user_id}",
-=======
-   f"http://localhost:5000/api/users/{user_id}",
->>>>>>> d557a03c8ed096459ff8659dae74cedbfb51ed02
    headers={"Authorization": f"Bearer {token}"}
    )
    data = response.json()
@@ -115,11 +111,7 @@ def test_api_token_expired(conn, cursor):
       "dev-secret-key",
       algorithm="HS256"
    )
-<<<<<<< HEAD
       response = requests.get(f"{BASE_URL}/users/{user_id}",
-=======
-      response = requests.get(f"http://localhost:5000/api/users/{user_id}",
->>>>>>> d557a03c8ed096459ff8659dae74cedbfb51ed02
                               headers={"Authorization": f"Bearer {expired_token}"}
    )
       
