@@ -1,5 +1,7 @@
 import pytest
+import jwt
 from src.database.database import get_db_connection, close_db_connection
+from datetime import datetime, timezone, timedelta
 
 BASE_URL = "http://localhost:5000/api"
 
@@ -19,3 +21,12 @@ def cursor(conn):
     conn.commit()
     close_db_connection(conn)
 
+@pytest.fixture(scope="function", autouse=False)
+def create_token():              
+    def _make(user_id):        
+        return jwt.encode(
+            {"user_id": user_id, "exp": datetime.now(timezone.utc) + timedelta(minutes=15)},
+            "dev-secret-key",
+            "HS256"
+        )
+    return _make              
