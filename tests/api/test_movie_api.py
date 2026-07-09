@@ -9,7 +9,8 @@ import allure
 from datetime import datetime, timezone, timedelta
 from tests.api.conftest import BASE_URL
 
-
+@allure.feature("API Movies")
+@allure.story("Access Control")
 def test_api_premium_user_watches_premium_movie(cursor, conn, create_token):
 
     user_id = register_user("username1", "password1", "bartek@example.com", is_premium=True, cursor=cursor)
@@ -23,6 +24,8 @@ def test_api_premium_user_watches_premium_movie(cursor, conn, create_token):
     
     assert response.status_code == 200, f"Premium user should be able to watch movie, got status code:{response.status_code}"
 
+@allure.feature("API Movies")
+@allure.story("Access Control")
 def test_api_non_premium_user_watches_premium_movie(cursor, conn, create_token):
 
     user_id = register_user("username1", "password1", "bartek@example.com", is_premium=False, cursor=cursor)
@@ -36,6 +39,8 @@ def test_api_non_premium_user_watches_premium_movie(cursor, conn, create_token):
     
     assert response.status_code == 403, f"Non premium user should not be able to watch movie, got status code:{response.status_code}"
 
+@allure.feature("API Movies")
+@allure.story("Access Control")
 def test_api_non_premium_user_watches_non_premium_movie(cursor, conn, create_token):
 
     user_id = register_user("username1", "password1", "bartek@example.com", is_premium=False, cursor=cursor)
@@ -49,6 +54,8 @@ def test_api_non_premium_user_watches_non_premium_movie(cursor, conn, create_tok
     
     assert response.status_code == 200, f"Non premium user should be able to watch non premium movie, got status code:{response.status_code}"
 
+@allure.feature("API Movies")
+@allure.story("Access Control")
 def test_api_user_with_ppv_access_watches_premium_movie(cursor, conn, create_token):
     user_id = register_user("username1", "password1", "bartek@example.com", is_premium=False, cursor=cursor)
     movie_id = create_movie("2000-01-01", True, "pl", "Movie", "movie description", cursor = cursor)
@@ -65,6 +72,8 @@ def test_api_user_with_ppv_access_watches_premium_movie(cursor, conn, create_tok
     
     assert response.status_code == 200, f"User with ppv access should be able to watch premium movie, got status code:{response.status_code}"
 
+@allure.feature("API Movies")
+@allure.story("Access Control")
 def test_api_non_existing_movie(cursor, conn, create_token):
     user_id = register_user("username1", "password1", "bartek@example.com", is_premium=True, cursor=cursor)
     conn.commit()
@@ -76,7 +85,9 @@ def test_api_non_existing_movie(cursor, conn, create_token):
                             headers={"Authorization": f"Bearer {token}"})
     
     assert response.status_code == 404, f"Movie should not exists, got status code:{response.status_code}"
-
+    
+@allure.feature("API Movies")
+@allure.story("Access Control")
 def test_api_user_without_token_watches_movie(cursor, conn):
     user_id = register_user("username1", "password1", "bartek@example.com", is_premium=True, cursor=cursor)
     movie_id = create_movie("2000-01-01", True, "pl", "Movie", "movie description", cursor = cursor)
