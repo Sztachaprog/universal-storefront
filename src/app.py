@@ -22,7 +22,7 @@ import jwt
 
 
 app = Flask(__name__)
-app.secret_key = "dev-secret-key"
+app.secret_key = "dev-secret-key-hardcoded-for-now-to-change"
 
 
 def token_required(f):

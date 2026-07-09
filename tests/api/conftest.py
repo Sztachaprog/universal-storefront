@@ -26,7 +26,7 @@ def create_token():
     def _make(user_id):        
         return jwt.encode(
             {"user_id": user_id, "exp": datetime.now(timezone.utc) + timedelta(minutes=15)},
-            "dev-secret-key",
+            "dev-secret-key-hardcoded-for-now-to-change",
             "HS256"
         )
     return _make              
