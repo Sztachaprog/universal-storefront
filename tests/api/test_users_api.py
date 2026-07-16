@@ -1,6 +1,7 @@
 from src.application import (
     register_user,
-    get_user_by_name
+    get_user_by_name,
+    get_user_by_id
 )
 import requests
 import allure
@@ -145,6 +146,47 @@ def test_api_token_missing():
    assert response.status_code == 401, f"Token should be missing '401', got status code: {response.status_code} "
    assert response.json()["error"] == "Token is missing"
 
-# @allure.feature("API Users")
-# @allure.story("Authentication")
-# def test_api_
+
+
+
+@allure.feature("API Users")
+@allure.story("Upgrade to Premium")
+def test_api_upgrade_non_premium_user_to_premium(conn, cursor, create_token):
+
+   user_id = register_user("username1", "password1", "bartek@example.com", is_premium=False, cursor=cursor)
+   conn.commit()
+
+   token = create_token(user_id)
+
+   response = requests.put(f"{BASE_URL}/upgrade",
+                           headers={"Authorization": f"Bearer {token}"})
+   
+   assert response.status_code == 200, f"User should be upgraded to premium, got status code: {response.status_code}"
+
+   user = get_user_by_id(user_id, cursor=cursor)
+
+   assert user[3], "User should be premium in database"
+
+   
+@allure.feature("API Users")
+@allure.story("Upgrade to Premium")
+def test_api_upgrade_premium_user_to_premium(conn, cursor, create_token):
+
+   user_id = register_user("username1", "password1", "bartek@example.com", is_premium=True, cursor=cursor)
+   conn.commit()
+
+   token = create_token(user_id)
+
+   response = requests.put(f"{BASE_URL}/upgrade",
+                           headers={"Authorization": f"Bearer {token}"})
+   
+   assert response.status_code == 409, f"User should not be able to buy premium again, got status code: {response.status_code}"
+
+
+@allure.feature("API Users")
+@allure.story("Upgrade to Premium")
+def test_api_upgrade_without_token():
+
+   response = requests.put(f"{BASE_URL}/upgrade")
+   
+   assert response.status_code == 401, f"User without token should not access upgrade, got {response.status_code}"
