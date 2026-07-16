@@ -124,7 +124,7 @@ def test_api_token_invalid():
 
    invalid_token = jwt.encode(
       {"user_id": 1, "exp": datetime.now(timezone.utc) + timedelta(minutes=15)},
-      "wrong-key",
+      "wrong-key_llllllllllllllllllllll",
       algorithm="HS256"
    )
 
@@ -144,3 +144,7 @@ def test_api_token_missing():
 
    assert response.status_code == 401, f"Token should be missing '401', got status code: {response.status_code} "
    assert response.json()["error"] == "Token is missing"
+
+# @allure.feature("API Users")
+# @allure.story("Authentication")
+# def test_api_

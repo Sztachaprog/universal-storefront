@@ -15,7 +15,8 @@ get_user_by_id,
 get_movie_by_id,
 get_movie_details,
 create_movie,
-process_watch_request
+process_watch_request,
+upgrade_user_to_premium
 )
 import bcrypt
 import jwt
@@ -147,6 +148,9 @@ if __name__ == "__main__":
 
 
 
+
+
+
 # API routes for tests purpose
 
 @app.route("/api/users", methods=["POST"])
@@ -232,6 +236,28 @@ def watch_movie_api(current_user_id, movie_id):
         else:
             return jsonify({"error": "Access denied. Upgrade to premium or buy ppv to watch this movie."}), 403
                 
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        close_db_connection(conn, cursor)
+
+@app.route("/api/upgrade", methods=["PUT"])
+@token_required
+def upgrade_user_api(current_user_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        user = get_user_by_id(current_user_id, cursor = cursor)
+        if user[3]:
+            return jsonify({"error": "User already has premium"}), 409
+        upgrade_user_to_premium(current_user_id, cursor=cursor)
+        conn.commit()
+        upgraded_user = get_user_by_id(current_user_id, cursor=cursor)
+        
+        if upgraded_user[3]:
+            return jsonify({"message": "Upgraded to premium"}), 200
+        else:
+            return jsonify({"error": "Access denied"}), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     finally:
