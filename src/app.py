@@ -174,15 +174,13 @@ def post_user_api():
     finally:
         close_db_connection(conn, cursor)
 
-@app.route("/api/users/<int:id>") # TO DO change logic for users/profile
+@app.route("/api/me") # TO DO change logic for users/profile
 @token_required
-def get_user_api(current_user_id, id):
+def get_user_api(current_user_id):
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
-        user = get_user_by_id(id, cursor=cursor)
-        if current_user_id != id:
-            return jsonify({"error": "Unauthorized access"}), 403
+        user = get_user_by_id(current_user_id, cursor=cursor)
         if user is None:
             return jsonify({"error": "User not found"}), 404
         return jsonify({

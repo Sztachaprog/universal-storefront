@@ -11,9 +11,9 @@ from tests.api.conftest import BASE_URL
 
 @allure.feature("API Users")
 @allure.story("GET User")
-def test_api_get_user(cursor, conn):
+def test_api_get_current_user(cursor, conn):
 
-   user_id = register_user("username1", "password1", "bartek@example.com", is_premium=False, cursor=cursor)
+   register_user("username1", "password1", "bartek@example.com", is_premium=False, cursor=cursor)
    conn.commit()
    login = requests.post(f"{BASE_URL}/login", json={
                         "username": "username1",
@@ -21,7 +21,7 @@ def test_api_get_user(cursor, conn):
    })
    token = login.json()["token"]
    response = requests.get(
-   f"{BASE_URL}/users/{user_id}",
+   f"{BASE_URL}/me",
    headers={"Authorization": f"Bearer {token}"}
    )
    data = response.json()
@@ -112,7 +112,7 @@ def test_api_token_expired(conn, cursor):
       "dev-secret-key-hardcoded-for-now-to-change",
       algorithm="HS256"
    )
-      response = requests.get(f"{BASE_URL}/users/{user_id}",
+      response = requests.get(f"{BASE_URL}/me",
                               headers={"Authorization": f"Bearer {expired_token}"}
    )
       
@@ -129,7 +129,7 @@ def test_api_token_invalid():
       algorithm="HS256"
    )
 
-   response = requests.get(f"{BASE_URL}/users/1",
+   response = requests.get(f"{BASE_URL}/me",
    headers={"Authorization": f"Bearer {invalid_token}"
    })
 
@@ -141,7 +141,7 @@ def test_api_token_invalid():
 @allure.story("Authentication")
 def test_api_token_missing():
 
-   response = requests.get(f"{BASE_URL}/users/1")
+   response = requests.get(f"{BASE_URL}/me")
 
    assert response.status_code == 401, f"Token should be missing '401', got status code: {response.status_code} "
    assert response.json()["error"] == "Token is missing"
