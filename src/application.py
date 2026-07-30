@@ -134,6 +134,8 @@ def update_movie(release_date, is_premium_only, language_code, title, descriptio
             is_premium_only = %s 
             WHERE id = %s;
         """, (release_date, is_premium_only, movie_id))
+        if cursor.rowcount == 0:                                                        # rowcount returns number of changed rows, if there is no row changed, it means that the movie with the given ID does not exist
+            raise ValueError(f"Movie with ID {movie_id} does not exist.")
         cursor.execute("""
             UPDATE movie_translations
             SET language_code = %s,
@@ -146,6 +148,8 @@ def update_movie(release_date, is_premium_only, language_code, title, descriptio
 def delete_movie(movie_id, cursor = None):
 
         cursor.execute("DELETE FROM movies WHERE id = %s;", (movie_id,))
+        if cursor.rowcount == 0: 
+            raise ValueError(f"Movie with ID {movie_id} does not exist.")
 
 
 # Access control
