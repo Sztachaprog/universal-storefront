@@ -5,6 +5,7 @@ from src.application import (
     delete_movie
 )
 import allure
+import pytest
 
 # Create
 @allure.feature("Database Movie")
@@ -39,14 +40,22 @@ def test_get_movie(cursor):
 @allure.story("Update Movie")
 def test_update_movie(cursor):
     movie_id = create_movie("2024-01-01", True, "pl", "Polski film", "Opis polskiego filmu", cursor = cursor)
-    updated_movies = update_movie("2025-01-01", False, "en", "English Movie", "Description of English movie", movie_id, cursor = cursor)
-    get_updated_movies = get_movie_details(updated_movies, "en", cursor = cursor)
+    updated_movie_id = update_movie("2025-01-01", False, "en", "English Movie", "Description of English movie", movie_id, cursor = cursor)
+    get_updated_movies = get_movie_details(updated_movie_id, "en", cursor = cursor)
 
     assert get_updated_movies is not None, "Movie not found in database"
     assert str(get_updated_movies[1]) == "2025-01-01", f"Expected release date '2025-01-01', got '{get_updated_movies[1]}'"
     assert get_updated_movies[2] == False, f"Expected is_premium_only False, got {get_updated_movies[2]}"
     assert get_updated_movies[3] == "English Movie", f"Expected title 'English Movie', got '{get_updated_movies[3]}'"
     assert get_updated_movies[4] == "Description of English movie", f"Expected description 'Description of English movie', got '{get_updated_movies[4]}'"
+
+@allure.feature("Database Movie")
+@allure.story("Update Movie")
+def test_update_nonexistent_movie(cursor):
+
+    with pytest.raises(ValueError, match="does not exist"):
+        update_movie("2025-01-01", False, "en", "English Movie", "Description of English movie", 9999, cursor = cursor)
+
 
 # Delete
 @allure.feature("Database Movie")
@@ -57,3 +66,10 @@ def test_delete_movie(cursor):
     movie_details = get_movie_details(movie_id, "pl", cursor = cursor)
 
     assert movie_details is None, "Movie was not deleted from database"
+
+@allure.feature("Database Movie")
+@allure.story("Delete Movie")
+def test_delete_nonexistent_movie(cursor):
+
+    with pytest.raises(ValueError, match="does not exist"):
+        delete_movie(99999, cursor=cursor)
