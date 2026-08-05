@@ -98,4 +98,5 @@ def test_api_user_without_token_watches_movie(cursor, conn):
     
     assert response.status_code == 401, f"User should not be able to watch movie without authorization, got status code:{response.status_code}"
 
+
     

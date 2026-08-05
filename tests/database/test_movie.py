@@ -2,7 +2,9 @@ from src.application import (
     create_movie,
     get_movie_details,
     update_movie,
-    delete_movie
+    delete_movie,
+    get_movie_by_id
+
 )
 import allure
 import pytest
@@ -34,6 +36,12 @@ def test_get_movie(cursor):
     assert movie_details[2] == True, f"Expected is_premium_only True, got {movie_details[2]}"
     assert movie_details[3] == "Polski film", f"Expected title 'Polski film', got '{movie_details[3]}'"
     assert movie_details[4] == "Opis polskiego filmu", f"Expected description 'Opis polskiego filmu', got '{movie_details[4]}'"
+
+def test_get_nonexisting_movie(cursor):
+
+    movie_details = get_movie_by_id(999999, cursor=cursor)
+
+    assert movie_details is None, "Movie should not exist"
 
 # Update
 @allure.feature("Database Movie")
@@ -73,3 +81,4 @@ def test_delete_nonexistent_movie(cursor):
 
     with pytest.raises(ValueError, match="does not exist"):
         delete_movie(99999, cursor=cursor)
+
