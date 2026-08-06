@@ -37,6 +37,9 @@ def test_get_movie(cursor):
     assert movie_details[3] == "Polski film", f"Expected title 'Polski film', got '{movie_details[3]}'"
     assert movie_details[4] == "Opis polskiego filmu", f"Expected description 'Opis polskiego filmu', got '{movie_details[4]}'"
 
+    
+@allure.feature("Database Movie")
+@allure.story("Get Movie")
 def test_get_nonexisting_movie(cursor):
 
     movie_details = get_movie_by_id(999999, cursor=cursor)

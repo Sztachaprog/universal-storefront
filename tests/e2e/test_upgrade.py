@@ -22,7 +22,7 @@ def test_upgrade_to_premium(page, cursor, registered_user):
     expect(dashboard_page.active_premium_status()).to_have_text("Premium Active")
     
     username = get_user_by_name(registered_user.username, cursor=cursor)
-    assert username[3] == True, "Premium should be premium"
+    assert username[3], "Premium should be premium"
 
 @allure.feature("E2E Premium")
 @allure.story("Upgrade duplicate")
