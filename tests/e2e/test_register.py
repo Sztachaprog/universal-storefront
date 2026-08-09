@@ -1,6 +1,6 @@
 from playwright.sync_api import expect
 from src.application import(
-    register_user
+    get_user_by_name
 )
 import allure
 from tests.e2e.pages.register_page import RegisterPage
@@ -8,7 +8,7 @@ from tests.e2e.pages.register_page import RegisterPage
 
 @allure.feature("E2E Registration")
 @allure.story("Correct Registration")
-def test_correct_register(page):
+def test_correct_register(page, cursor):
 
     register_page = RegisterPage(page)
     register_page.navigate()
@@ -18,6 +18,11 @@ def test_correct_register(page):
     register_page.submit()
     
     expect(register_page.success_register()).to_have_text("Succesfully registered")
+
+    user = get_user_by_name("testusername", cursor=cursor )
+    assert user is not None, "User should be in database"
+    assert user[1] == "testusername", "Username should match"
+    assert user[2] == "testuser@mail.com", "Email should match"
 
 @allure.feature("E2E Registration")
 @allure.story("Validation Errors")

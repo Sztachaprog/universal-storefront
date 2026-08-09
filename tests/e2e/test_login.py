@@ -11,9 +11,9 @@ def test_correct_login(page, registered_user):
 
     login_page = LoginPage(page)
     login_page.login(registered_user.username, registered_user.password)
-    login_page.get_welcome_name()
 
     expect(login_page.get_welcome_name()).to_have_text(registered_user.username)
+    assert page.url == "http://localhost:5000/dashboard", "After correct login user should be on /dashboard page "
 
 @allure.feature("E2E Authentication")
 @allure.story("Incorrect credentials")

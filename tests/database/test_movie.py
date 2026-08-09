@@ -24,6 +24,12 @@ def test_create_movie(cursor):
     assert movie_details[3] == "Polski film", f"Expected title 'Polski film', got '{movie_details[3]}'"
     assert movie_details[4] == "Opis polskiego filmu", f"Expected description 'Opis polskiego filmu', got '{movie_details[4]}'"
 
+def test_invalid_length_language_code(cursor):
+
+    with pytest.raises(ValueError):
+        create_movie("2024-01-01", True, "pll", "Polski film", "Opis polskiego filmu", cursor = cursor)
+    
+
 # Read
 @allure.feature("Database Movie")
 @allure.story("Get Movie")

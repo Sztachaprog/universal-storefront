@@ -101,7 +101,9 @@ def update_user_password(user_id, new_password, cursor = None):
 
 # CREATE movies
 def create_movie(release_date, is_premium_only, language_code, title, description, cursor = None):
-
+        
+        if len(language_code) != 2:
+               raise ValueError("Language code should contain 2 characters")
         query_movie = "INSERT INTO movies (release_date, is_premium_only) VALUES (%s, %s) RETURNING id;"
         cursor.execute(query_movie, (release_date, is_premium_only))
         movie_id = cursor.fetchone()[0]
