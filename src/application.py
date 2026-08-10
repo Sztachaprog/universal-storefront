@@ -127,6 +127,17 @@ def get_movie_by_id(movie_id, cursor = None):
         movie = cursor.fetchone()
         return movie
 
+def get_all_movies(language_code, cursor=None):
+    cursor.execute("""
+        SELECT movies.id, movies.is_premium_only, movie_translations.title
+        FROM movies
+        JOIN movie_translations ON movies.id = movie_translations.movie_id
+        WHERE movie_translations.language_code = %s
+        ORDER BY movies.id;
+    """, (language_code,))
+    movies = cursor.fetchall()
+    return movies
+
 # UPDATE movies
 def update_movie(release_date, is_premium_only, language_code, title, description, movie_id, cursor = None):
 
