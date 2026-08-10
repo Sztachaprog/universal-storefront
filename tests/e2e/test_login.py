@@ -1,7 +1,7 @@
-from playwright.sync_api import (
-    expect
-)
+from playwright.sync_api import expect
+
 from tests.e2e.pages.login_page import LoginPage
+from tests.e2e.pages.dashboard_page import DashboardPage
 import allure
 
 
@@ -10,10 +10,11 @@ import allure
 def test_correct_login(page, registered_user):
 
     login_page = LoginPage(page)
+    dashboard_page = DashboardPage(page)
     login_page.login(registered_user.username, registered_user.password)
 
-    expect(login_page.get_welcome_name()).to_have_text(registered_user.username)
-    assert page.url == "http://localhost:5000/dashboard", "After correct login user should be on /dashboard page "
+    expect(dashboard_page.get_welcome_name()).to_have_text(registered_user.username)
+    assert page.url == "http://localhost:5000/dashboard", "After correct login user should be on /dashboard page"
 
 @allure.feature("E2E Authentication")
 @allure.story("Incorrect credentials")
