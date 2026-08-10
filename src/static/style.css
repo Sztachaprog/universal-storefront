@@ -479,3 +479,55 @@ body.page-wide {
     .detail-poster { max-width: 240px; }
     .topbar { flex-direction: column; align-items: flex-start; }
 }
+
+
+/* ============================================================
+   DASHBOARD PANELS — dopisz na końcu style.css (po sekcji movies)
+   ============================================================ */
+
+.dashboard-panels {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+}
+
+.panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 2rem;
+    position: relative;
+}
+
+.panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 2px; height: 100%;
+    background: var(--accent);
+}
+
+.panel-label {
+    display: block;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+}
+
+.panel-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+}
+.panel-value.muted { color: var(--muted); }
+
+.panel-note {
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+}

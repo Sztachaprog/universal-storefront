@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,23 +6,49 @@
 <title>Storefront — Dashboard</title>
 <link rel="stylesheet" href="/static/style.css">
 </head>
-<body>
-<div class="card dashboard-card">
-    <div class="logo">Universal Storefront</div>
-    <h1>Welcome,<br><span class="welcome-name">{{ username }}</span>.</h1>
-    <hr class="divider">
-    {% if is_premium %}
-    <div class="status-badge active" id="premium-status">Premium Active</div>
-    <p style="font-size:0.8rem; color: var(--muted);">You have full access to all content.</p>
-    {% else %}
-    <div class="status-badge inactive" id="premium-status">Standard Plan</div>
-    <p style="font-size:0.8rem; color: var(--muted); margin-bottom: 1.5rem;">Upgrade to unlock all premium content.</p>
-    <form method="POST" action="/upgrade">
-        <input type="hidden" name="user_id" value="{{ user_id }}">
-        <button type="submit" id="upgrade-btn">Upgrade to Premium →</button>
-    </form>
-    {% endif %}
-    <a href="/logout" id="logout-btn" class="link" style="margin-top:2rem;">← Sign out</a>
+<body class="page-wide">
+<div class="wrapper">
+    <header class="topbar">
+        <div class="logo">Universal Storefront</div>
+        <nav class="topnav">
+            <span class="nav-user welcome-name">{{ username }}</span>
+            {% if is_premium %}
+            <span class="status-badge active" id="premium-status">Premium Active</span>
+            {% else %}
+            <span class="status-badge inactive" id="premium-status">Standard Plan</span>
+            {% endif %}
+            <a href="/movies" class="nav-link">Catalog</a>
+            <a href="/logout" id="logout-btn" class="nav-link">Sign out</a>
+        </nav>
+    </header>
+
+    <h1 class="page-title">Welcome,<br><span class="profile_name">{{ username }}</span>.</h1>
+    <p class="subtitle">Manage your account and access</p>
+
+    <div class="dashboard-panels">
+        <div class="panel">
+            <span class="panel-label">Membership</span>
+            {% if is_premium %}
+            <div class="panel-value">Premium</div>
+            <p class="panel-note">You have full access to all content, including premium titles.</p>
+            <a href="/movies" class="btn-action btn-watch" style="max-width:220px;">Browse catalog →</a>
+            {% else %}
+            <div class="panel-value muted">Standard</div>
+            <p class="panel-note">Upgrade to unlock all premium content.</p>
+            <form method="POST" action="/upgrade" style="max-width:260px;">
+                <input type="hidden" name="user_id" value="{{ user_id }}">
+                <button type="submit" id="upgrade-btn">Upgrade to Premium →</button>
+            </form>
+            {% endif %}
+        </div>
+
+        <div class="panel">
+            <span class="panel-label">Explore</span>
+            <div class="panel-value">Catalog</div>
+            <p class="panel-note">Browse available titles and start watching.</p>
+            <a href="/movies" class="btn-action btn-upgrade" style="max-width:220px;">Open catalog</a>
+        </div>
+    </div>
 </div>
 </body>
 </html>
