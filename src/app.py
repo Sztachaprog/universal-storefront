@@ -144,6 +144,79 @@ def upgrade():
             close_db_connection(conn, cursor)
     return render_template("dashboard.html", error=None, success=None)
 
+
+@app.route("/movies")
+def movies():
+    if "username" not in session:
+        return redirect(url_for("login"))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        movies_list = get_all_movies("en", cursor=cursor)
+        return render_template("movies.html",
+            username=session["username"],
+            is_premium=session["is_premium"],
+            movies=movies_list
+        )
+    finally:
+        close_db_connection(conn, cursor)
+
+
+@app.route("/movies/<int:movie_id>")
+def movie_detail(movie_id):
+    if "username" not in session:
+        return redirect(url_for("login"))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        movie = get_movie_details(movie_id, "en", cursor=cursor)
+        if movie is None:
+            return render_template("movie_not_found.html"), 404
+
+        has_access = process_watch_request(session["user_id"], movie_id, cursor=cursor)
+
+        return render_template("movie_detail.html",
+            username=session["username"],
+            is_premium=session["is_premium"],
+            movie_id=movie[0],
+            release_date=movie[1],
+            is_premium_only=movie[2],
+            title=movie[3],
+            description=movie[4],
+            has_access=has_access
+        )
+    finally:
+        close_db_connection(conn, cursor)
+
+
+@app.route("/movies/<int:movie_id>/watch")
+def watch_movie(movie_id):
+    if "username" not in session:
+        return redirect(url_for("login"))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        movie = get_movie_details(movie_id, "en", cursor=cursor)
+        if movie is None:
+            return render_template("movie_not_found.html"), 404
+
+        has_access = process_watch_request(session["user_id"], movie_id, cursor=cursor)
+        if not has_access:
+            return redirect(url_for("movie_detail", movie_id=movie_id))
+
+        return render_template("watch.html",
+            username=session["username"],
+            movie_id=movie[0],
+            title=movie[3]
+        )
+    finally:
+        close_db_connection(conn, cursor)
+
+
+
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
 
