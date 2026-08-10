@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Storefront — Movies</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="page-wide">
+<div class="wrapper">
+    <header class="topbar">
+        <div class="logo">Universal Storefront</div>
+        <nav class="topnav">
+            <span class="nav-user">{{ username }}</span>
+            {% if is_premium %}
+            <span class="status-badge active">Premium</span>
+            {% else %}
+            <span class="status-badge inactive">Standard</span>
+            {% endif %}
+            <a href="/dashboard" class="nav-link">Dashboard</a>
+            <a href="/logout" id="logout-btn" class="nav-link">Sign out</a>
+        </nav>
+    </header>
+
+    <h1 class="page-title">Catalog.</h1>
+    <p class="subtitle">Browse and watch available titles</p>
+
+    {% if movies %}
+    <div class="movie-grid" id="movie-grid">
+        {% for movie in movies %}
+        <a href="/movies/{{ movie[0] }}" class="movie-card" data-movie-id="{{ movie[0] }}">
+            <div class="movie-thumb">
+                <span class="movie-thumb-id">#{{ movie[0] }}</span>
+                {% if movie[1] %}
+                <span class="tag premium">Premium</span>
+                {% else %}
+                <span class="tag free">Free</span>
+                {% endif %}
+            </div>
+            <div class="movie-info">
+                <span class="movie-title">{{ movie[2] }}</span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state" id="empty-state">No titles available yet.</div>
+    {% endif %}
+</div>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Storefront — Now Playing</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="page-wide">
+<div class="wrapper">
+    <header class="topbar">
+        <div class="logo">Universal Storefront</div>
+        <nav class="topnav">
+            <span class="nav-user">{{ username }}</span>
+            <a href="/movies" class="nav-link">Catalog</a>
+            <a href="/logout" id="logout-btn" class="nav-link">Sign out</a>
+        </nav>
+    </header>
+
+    <a href="/movies/{{ movie_id }}" class="back-link">← Back to title</a>
+
+    <div class="player">
+        <div class="player-screen" id="player-screen">
+            <div class="player-icon">▶</div>
+            <p class="player-now" id="now-playing">Now playing: <span class="player-title">{{ title }}</span></p>
+            <p class="player-sub">Playback placeholder — video stream would render here</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -15,6 +15,7 @@ get_user_by_id,
 get_movie_by_id,
 get_movie_details,
 create_movie,
+get_all_movies,
 process_watch_request,
 upgrade_user_to_premium
 )

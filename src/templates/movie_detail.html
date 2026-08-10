@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Storefront — {{ title }}</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="page-wide">
+<div class="wrapper">
+    <header class="topbar">
+        <div class="logo">Universal Storefront</div>
+        <nav class="topnav">
+            <span class="nav-user">{{ username }}</span>
+            {% if is_premium %}
+            <span class="status-badge active">Premium</span>
+            {% else %}
+            <span class="status-badge inactive">Standard</span>
+            {% endif %}
+            <a href="/movies" class="nav-link">Catalog</a>
+            <a href="/logout" id="logout-btn" class="nav-link">Sign out</a>
+        </nav>
+    </header>
+
+    <a href="/movies" class="back-link">← Back to catalog</a>
+
+    <div class="detail-layout">
+        <div class="detail-poster">
+            <span class="detail-poster-id">#{{ movie_id }}</span>
+            {% if is_premium_only %}
+            <span class="tag premium">Premium</span>
+            {% else %}
+            <span class="tag free">Free</span>
+            {% endif %}
+        </div>
+
+        <div class="detail-body">
+            <h1 class="detail-title" id="movie-title">{{ title }}</h1>
+            <p class="detail-meta">Released {{ release_date }}</p>
+            <p class="detail-description">{{ description }}</p>
+
+            <div class="detail-actions">
+                {% if has_access %}
+                <a href="/movies/{{ movie_id }}/watch" class="btn-action btn-watch" id="watch-btn">▶ Watch</a>
+                {% else %}
+                <a href="/dashboard" class="btn-action btn-upgrade" id="upgrade-btn">Upgrade to Premium</a>
+                <button class="btn-action btn-buy" id="buy-access-btn" disabled>Buy one month access</button>
+                <p class="access-note" id="access-note">Coming soon — single title access</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
