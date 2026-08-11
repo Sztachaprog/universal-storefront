@@ -40,15 +40,20 @@ universal-storefront/
 │   ├── static/
 │   │   └── style.css            # Frontend styles
 │   ├── templates/
+│   │   ├── dashboard.html       # dashboard page
 │   │   ├── login.html           # Login page
+│   │   ├── movie_detail.html    # movie_detail page
+│   │   ├── movie_not_found.html # movie_not_found page
+│   │   ├── movies.html          # movies page
 │   │   ├── register.html        # Register page
-│   │   └── dashboard.html       # Dashboard page 
+│   │   └── watch_html           # watch page
 │   ├── app.py                   # Flask application (routes, session management)
 │   └── application.py           # Business logic (users, movies, access control)
 ├── tests/
 │   ├── conftest.py              # Shared fixture: database schema setup
 │   ├── api/
 │   │   ├── conftest.py          # DB fixture: connection + TRUNCATE after each test
+│   │   ├── test_movie_api.py    # API tests: CRUD + JWT auth scenarios
 │   │   └── test_users_api.py    # API tests: CRUD + JWT auth scenarios
 │   ├── database/
 │   │   ├── conftest.py          # DB fixture: connection + rollback after each test
@@ -60,10 +65,12 @@ universal-storefront/
 │       ├── pages/
 │       │   ├── login_page.py    # Page Object: login page
 │       │   ├── register_page.py # Page Object: register page
+│       │   ├── movies_page.py   # Page Object: movies page
 │       │   └── dashboard_page.py # Page Object: dashboard
 │       ├── test_auth.py         # E2E: authentication flow
-│       ├── test_register.py     # E2E: user registration flow
 │       ├── test_login.py        # E2E: login flow
+│       ├── test_movies.py       # E2E: movies flow
+│       ├── test_register.py     # E2E: user registration flow
 │       └── test_upgrade.py      # E2E: upgrade to premium + DB verification
 ├── docker-compose.yml
 ├── pyproject.toml
