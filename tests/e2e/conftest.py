@@ -1,8 +1,12 @@
 import pytest
 import allure
-from src.application import register_user
+from src.application import (
+    register_user,
+    create_movie
+)
 from src.database.database import get_db_connection, close_db_connection
 from dataclasses import dataclass
+from tests.e2e.pages.login_page import LoginPage
 
 @dataclass
 class TestUser:
@@ -72,3 +76,25 @@ def registered_user_with_premium(cursor, conn):
     register_user(user.username, user.password, user.email, user.is_premium, cursor=cursor)
     conn.commit()
     return user
+
+@pytest.fixture(scope="function", autouse=False)
+def login_non_premium_user(page, registered_user):
+    login_page = LoginPage(page)
+
+    login_page.login(
+        registered_user.username,
+        registered_user.password
+    )
+
+@pytest.fixture(scope="function", autouse=False)
+def add_premium_movie(cursor, conn):
+    premium_movie = create_movie("2024-01-01", True, "en", "eng film", "eng description", cursor = cursor)
+    conn.commit()
+    return premium_movie
+
+@pytest.fixture(scope="function", autouse=False)
+def add_non_premium_movie(cursor, conn):
+    non_premium_movie = create_movie("2024-01-01", False, "en", "eng film", "eng description", cursor = cursor)
+    conn.commit()
+    return non_premium_movie
+    
