@@ -13,5 +13,3 @@ class DashboardPage:
         return self.page.locator("#premium-status")
     def get_welcome_name(self):
         return self.page.locator(".welcome-name")
-    
-    
