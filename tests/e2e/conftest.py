@@ -87,14 +87,20 @@ def login_non_premium_user(page, registered_user):
     )
 
 @pytest.fixture(scope="function", autouse=False)
-def add_premium_movie(cursor, conn):
-    premium_movie = create_movie("2024-01-01", True, "en", "eng film", "eng description", cursor = cursor)
-    conn.commit()
-    return premium_movie
+def login_premium_user(page, registered_user_with_premium):
+    login_page = LoginPage(page)
+
+    login_page.login(
+        registered_user_with_premium.username,
+        registered_user_with_premium.password
+    )
 
 @pytest.fixture(scope="function", autouse=False)
-def add_non_premium_movie(cursor, conn):
+def add_premium_and_non_premium_movies(cursor, conn):
+    premium_movie = create_movie("2024-01-01", True, "en", "eng film", "eng description", cursor = cursor)
+    conn.commit()
     non_premium_movie = create_movie("2024-01-01", False, "en", "eng film", "eng description", cursor = cursor)
     conn.commit()
-    return non_premium_movie
+    return premium_movie, non_premium_movie
+
     
