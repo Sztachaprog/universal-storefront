@@ -97,9 +97,9 @@ def login_premium_user(page, registered_user_with_premium):
 
 @pytest.fixture(scope="function", autouse=False)
 def add_premium_and_non_premium_movies(cursor, conn):
-    premium_movie = create_movie("2024-01-01", True, "en", "eng film", "eng description", cursor = cursor)
+    premium_movie = create_movie("2012-05-01", True, "en", "Interstellar", "Cosmic", cursor = cursor)
     conn.commit()
-    non_premium_movie = create_movie("2024-01-01", False, "en", "eng film", "eng description", cursor = cursor)
+    non_premium_movie = create_movie("2019-11-12", False, "en", "Breaking Bad", "Crime", cursor = cursor)
     conn.commit()
     return premium_movie, non_premium_movie
 
