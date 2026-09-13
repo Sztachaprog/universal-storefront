@@ -21,3 +21,9 @@ class MoviesPage:
 
     def get_movie_titles(self):
         return self.page.locator(".movie-title").all_inner_texts()
+
+    def watch_button(self):
+        return self.page.locator("#watch-btn")
+
+    def get_upgrade_to_premium_button(self):
+        return self.page.locator("#upgrade-btn")

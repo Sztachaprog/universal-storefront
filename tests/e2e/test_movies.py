@@ -56,4 +56,19 @@ def test_movie_cards_count_and_titles(page, login_non_premium_user, add_premium_
     movies_page.navigate()
 
     assert movies_page.get_movie_cards_count() == 2, "Should be 2 movie cards"
-    assert set(movies_page.get_movie_titles()) == {premium_movie_title, non_premium_movie_title, "nice"}, "invalid movie titles"
+    assert set(movies_page.get_movie_titles()) == {premium_movie_title, non_premium_movie_title}, "invalid movie titles"
+
+def test_non_premium_user_cannot_watch_premium_movie(page, login_non_premium_user, add_premium_and_non_premium_movies, cursor):
+
+
+    movies_page = MoviesPage(page)
+
+    movies_page.navigate()
+    movies_page.choose_premium_movie()
+
+    expect(movies_page.watch_button()).to_have_count(0), "Watch button should be not visible for non-premium user on premium movie"
+    expect(movies_page.get_upgrade_to_premium_button()).to_be_visible(), "Upgrade to premium button should be visible for non-premium user on premium movie"
+
+    (movies_page.get_upgrade_to_premium_button()).click()
+
+    expect(page).to_have_url("http://localhost:5000/dashboard"), "User should be navigate to /Dashboard page"
