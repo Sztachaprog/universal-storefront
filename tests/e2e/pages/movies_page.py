@@ -16,8 +16,8 @@ class MoviesPage:
     def press_watch_button(self):
         self.page.click("#watch-btn")
 
-    def get_movie_cards_count(self):
-        return self.page.locator(".movie-card").count()
+    def get_movie_cards(self):
+        return self.page.locator(".movie-card")
 
     def get_movie_titles(self):
         return self.page.locator(".movie-title").all_inner_texts()
@@ -27,3 +27,6 @@ class MoviesPage:
 
     def get_upgrade_to_premium_button(self):
         return self.page.locator("#upgrade-btn")
+
+    def get_player_screen(self):
+        return self.page.locator("#player-screen")
