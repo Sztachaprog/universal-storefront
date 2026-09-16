@@ -2,8 +2,12 @@ import pytest
 import jwt
 from src.database.database import get_db_connection, close_db_connection
 from datetime import datetime, timezone, timedelta
+import os
+from dotenv import load_dotenv
 
 BASE_URL = "http://localhost:5000/api"
+load_dotenv()
+SECRET_KEY = os.environ["SECRET_KEY"]
 
 @pytest.fixture(scope="function", autouse=False)
 def conn():
@@ -26,7 +30,7 @@ def create_token():
     def _make(user_id):        
         return jwt.encode(
             {"user_id": user_id, "exp": datetime.now(timezone.utc) + timedelta(minutes=15)},
-            "dev-secret-key-hardcoded-for-now-to-change",
+            SECRET_KEY,
             "HS256"
         )
     return _make              

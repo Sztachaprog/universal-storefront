@@ -778,6 +778,21 @@ pytest-base-url = ">=1.0.0,<3.0.0"
 python-slugify = ">=6.0.0,<9.0.0"
 
 [[package]]
+name = "python-dotenv"
+version = "1.2.3"
+description = "Read key-value pairs from a .env file and set them as environment variables"
+optional = false
+python-versions = ">=3.10"
+groups = ["main"]
+files = [
+    {file = "python_dotenv-1.2.3-py3-none-any.whl", hash = "sha256:904552145e8bfed22162c09dab1c2b9b54fefa7b23ba780f4f26ca0316b0f0d9"},
+    {file = "python_dotenv-1.2.3.tar.gz", hash = "sha256:a20a594dabeaa385725aa239d5244871c143ecb356add8a20fcf23773a6c3a35"},
+]
+
+[package.extras]
+cli = ["click (>=5.0)"]
+
+[[package]]
 name = "python-slugify"
 version = "8.0.4"
 description = "A Python slugify application that also handles Unicode"
@@ -880,4 +895,4 @@ watchdog = ["watchdog (>=2.3)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.14"
-content-hash = "6a292c481677856a271a111d36ec6c0ddcdd165026fe61a4096a8aaf8cf606a1"
+content-hash = "f71b66f5bffbf311ff7c40d50fe88d60b118f871e369f450bb116830f1b26c15"

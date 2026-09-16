@@ -8,6 +8,9 @@ import allure
 import jwt
 from datetime import datetime, timezone, timedelta
 from tests.api.conftest import BASE_URL
+import os
+
+SECRET_KEY = os.environ["SECRET_KEY"]
 
 @allure.feature("API Users")
 @allure.story("GET User")
@@ -36,7 +39,7 @@ def test_api_get_non_exist_user():
 
    token = jwt.encode(
       {"user_id": 1, "exp": datetime.now(timezone.utc) + timedelta(minutes=15)},
-      "dev-secret-key-hardcoded-for-now-to-change",
+      SECRET_KEY,
       algorithm="HS256")
    response = requests.get(f"{BASE_URL}/users/1",
                            headers={"Authorization": f"Bearer {token}"}
@@ -109,7 +112,7 @@ def test_api_token_expired(conn, cursor):
       conn.commit()
       expired_token = jwt.encode(
       {"user_id": 1, "exp": datetime.now(timezone.utc) - timedelta(minutes=1)},
-      "dev-secret-key-hardcoded-for-now-to-change",
+      SECRET_KEY,
       algorithm="HS256"
    )
       response = requests.get(f"{BASE_URL}/me",

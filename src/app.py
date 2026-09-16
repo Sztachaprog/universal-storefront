@@ -1,6 +1,8 @@
 from flask import Flask, request, render_template, redirect, session, url_for, jsonify
 from datetime import datetime, timedelta, timezone
 from functools import wraps
+import os
+from dotenv import load_dotenv
 
 from src.database.database import (
     get_db_connection,
@@ -24,7 +26,9 @@ import jwt
 
 
 app = Flask(__name__)
-app.secret_key = "dev-secret-key-hardcoded-for-now-to-change"
+load_dotenv()   # wczytuje .env → os.environ (lokalnie)
+
+app.secret_key = os.environ["SECRET_KEY"]   # zamiast wpisanego stringa
 
 
 def token_required(f):
