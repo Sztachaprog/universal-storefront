@@ -44,7 +44,8 @@ jobs:
         run: poetry run playwright install --with-deps chromium # --with-deps - library etc to use browser on ubuntu
 
       - name: Run integration tests
-        run: poetry run pytest tests/database
+        id: db_tests
+        run: poetry run pytest tests/database --alluredir=allure-results
 
       - name: Start Flask
         run: poetry run python -m flask --app src.app run --port 5000 &
@@ -53,7 +54,25 @@ jobs:
         run: sleep 3
 
       - name: Run API tests
-        run: poetry run pytest tests/api
+        id: api_tests
+        run: poetry run pytest tests/api --alluredir=allure-results
 
       - name: Run E2E tests
-        run: poetry run pytest tests/e2e
+        id: e2e_tests
+        run: poetry run pytest tests/e2e --alluredir=allure-results
+        
+      - name: Install allure commandline
+        if: always() && steps.db_tests.outcome != 'skipped'
+        run: npm install -g allure-commandline
+
+      - name: Generate allure report
+        if: always() && steps.db_tests.outcome != 'skipped'
+        run: allure generate allure-results
+      
+      - name: Upload allure report
+        if: always() && steps.db_tests.outcome != 'skipped'
+        uses: actions/upload-artifact@v4                    # actions github orgranization, upload-artifact - upload files to github, @v4 - version of action
+        with:
+          name: allure-report
+          path: allure-report
+        
