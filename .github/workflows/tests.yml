@@ -51,9 +51,9 @@ jobs:
         id: start_flask
         if: always() && steps.db_tests.outcome != 'skipped'
         run: |
-          poetry run python -m flask --app src.app run --port 5000 > flask.log 2>&1 &     # flask.log - catch flask log, 2>&1 - catch error log
+          poetry run python -m flask --app src.app run --port 5001 > flask.log 2>&1 &     # flask.log - catch flask log, 2>&1 - catch error log
           for i in $(seq 1 30); do
-            if curl -sf -o /dev/null http://localhost:5000/login; then                    # curl - send request to flask, -s silent, -f fail on 4xx/5xx, -o /dev/null - output to /dev/null check if flask is up
+            if curl -sf -o /dev/null http://localhost:5001/login; then                    # curl - send request to flask, -s silent, -f fail on 4xx/5xx, -o /dev/null - output to /dev/null check if flask is up
               echo "Flask is up after ${i}s"
               exit 0                                                                      # exit 0 - exit with success
             fi
