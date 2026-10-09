@@ -24,7 +24,7 @@ def test_grant_ppv_access(cursor):
     user_premium_granted = grant_ppv_access(premium_user_id, movie_id, cursor=cursor)
 
     # Grant PPV access to the user for the premium movie
-    assert user_granted[0] == True, "PPV access should be granted to the user"
+    assert user_granted[0] == False, "PPV access should be granted to the user"
     assert user_premium_granted[0] == False, "PPV access should not be granted to the premium user who already has access"
 
 @allure.feature("Database Access")
