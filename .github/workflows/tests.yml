@@ -41,24 +41,36 @@ jobs:
         run: poetry install
 
       - name: Install Playwright browsers
-        run: poetry run playwright install --with-deps chromium # --with-deps - library etc to use browser on ubuntu
+        run: poetry run playwright install --with-deps chromium                           # --with-deps - library etc to use browser on ubuntu
 
       - name: Run integration tests
         id: db_tests
         run: poetry run pytest tests/database --alluredir=allure-results
 
       - name: Start Flask
-        run: poetry run python -m flask --app src.app run --port 5000 &
-      
-      - name: Wait for Flask
-        run: sleep 3
-
+        id: start_flask
+        if: always() && steps.db_tests.outcome != 'skipped'
+        run: |
+          poetry run python -m flask --app src.app run --port 5000 > flask.log 2>&1 &     # flask.log - catch flask log, 2>&1 - catch error log
+          for i in $(seq 1 30); do
+            if curl -sf -o /dev/null http://localhost:5000/login; then                    # curl - send request to flask, -s silent, -f fail on 4xx/5xx, -o /dev/null - output to /dev/null check if flask is up
+              echo "Flask is up after ${i}s"
+              exit 0                                                                      # exit 0 - exit with success
+            fi
+            sleep 1
+          done
+          echo "Flask did not start within 30s"                                           
+          cat flask.log                                                                   # cat flask.log - print log to console github action
+          exit 1                                                                          # exit 1 - exit with error
+        
       - name: Run API tests
         id: api_tests
+        if: always() && steps.start_flask.outcome == 'success'
         run: poetry run pytest tests/api --alluredir=allure-results
 
       - name: Run E2E tests
         id: e2e_tests
+        if: always() && steps.start_flask.outcome == 'success'
         run: poetry run pytest tests/e2e --alluredir=allure-results
         
       - name: Install allure commandline
@@ -71,8 +83,7 @@ jobs:
       
       - name: Upload allure report
         if: always() && steps.db_tests.outcome != 'skipped'
-        uses: actions/upload-artifact@v4                    # actions github orgranization, upload-artifact - upload files to github, @v4 - version of action
+        uses: actions/upload-artifact@v4                                                # actions github orgranization, upload-artifact - upload files to github, @v4 - version of action
         with:
           name: allure-report
-          path: allure-report
-        
+          path: allure-report   
