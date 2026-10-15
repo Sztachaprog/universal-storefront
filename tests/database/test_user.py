@@ -12,7 +12,6 @@ from src.application import (
 import pytest
 import allure
 
-
 #Create
 @allure.feature("Database User")
 @allure.story("Create User")
@@ -30,49 +29,49 @@ def test_create_user(cursor):
 @allure.feature("Database User")
 @allure.story("Create User")
 def test_too_short_password(cursor):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match = "Password is too short"):
         register_user("username", "haslo", "bartek@example.com", is_premium=False, cursor=cursor) 
 
 @allure.feature("Database User")
 @allure.story("Create User")
 def test_no_username(cursor):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match = "Username is required"):
         register_user("", "password", "bartek@example.com", is_premium=False, cursor=cursor)
 
 @allure.feature("Database User")
 @allure.story("Create User")
 def test_too_short_username(cursor):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match = "Username is too short"):
         register_user("user", "password", "bartek@example.com", is_premium=False, cursor=cursor) 
 
 @allure.feature("Database User")
 @allure.story("Create User")
 def test_too_long_username(cursor):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match = "Username is too long"):
         register_user("u"*31, "password", "user@example.com", is_premium=False, cursor=cursor)
 
 @allure.feature("Database User")
 @allure.story("Create User")
 def test_too_long_password(cursor):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match = "Password is too long"):
         register_user("username", "p"*75, "user@example.com", is_premium=False, cursor=cursor)
 
 @allure.feature("Database User")
 @allure.story("Create User")
 def test_no_password(cursor):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match = "Password is required"):
         register_user("username", "", "user@example.com", is_premium=False, cursor=cursor)
 
 @allure.feature("Database User")
 @allure.story("Create User")
 def test_too_long_email(cursor):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match = "Email is too long"):
         register_user("username", "password", "e"*244 + "@example.com", is_premium=False, cursor=cursor)
 
 @allure.feature("Database User")
 @allure.story("Create User")
 def test_no_email(cursor):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match = "Email is required"):
         register_user("username", "password", "", is_premium=False, cursor=cursor)
 
 @allure.feature("Database User")
@@ -80,7 +79,7 @@ def test_no_email(cursor):
 def test_duplicate_username(cursor):
     register_user("username1", "password", "user1@example.com", cursor = cursor)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match = "Username already exists"):
         register_user("username1", "password", "user2@example.com", is_premium=True, cursor = cursor)
 
 @allure.feature("Database User")
@@ -88,13 +87,13 @@ def test_duplicate_username(cursor):
 def test_duplicate_email(cursor):
     register_user("username1", "password", "user1@example.com", cursor = cursor)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match = "Email already exists"):
         register_user("username2", "password", "user1@example.com", is_premium=True, cursor = cursor)
         
 @allure.feature("Database User")
 @allure.story("Create User")
 def test_special_chars(cursor):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match = "Forbidden characters in username"):
         register_user("miha!!.", "password", "user1@example.com", cursor = cursor)
 
 # Read

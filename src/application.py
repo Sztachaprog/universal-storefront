@@ -25,6 +25,9 @@ def register_user(username, password, email, is_premium=False, cursor = None):
         if len(email) > 255:
                 raise ValueError("Email is too long")
         
+        if password is None or password.strip() == "":
+                raise ValueError("Password is required")
+        
         if len(password) < 8:
                 raise ValueError("Password is too short")
         
