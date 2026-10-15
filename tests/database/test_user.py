@@ -35,6 +35,12 @@ def test_too_short_password(cursor):
 
 @allure.feature("Database User")
 @allure.story("Create User")
+def test_no_username(cursor):
+    with pytest.raises(ValueError):
+        register_user("", "password", "bartek@example.com", is_premium=False, cursor=cursor)
+
+@allure.feature("Database User")
+@allure.story("Create User")
 def test_too_short_username(cursor):
     with pytest.raises(ValueError):
         register_user("user", "password", "bartek@example.com", is_premium=False, cursor=cursor) 
@@ -50,6 +56,24 @@ def test_too_long_username(cursor):
 def test_too_long_password(cursor):
     with pytest.raises(ValueError):
         register_user("username", "p"*75, "user@example.com", is_premium=False, cursor=cursor)
+
+@allure.feature("Database User")
+@allure.story("Create User")
+def test_no_password(cursor):
+    with pytest.raises(ValueError):
+        register_user("username", "", "user@example.com", is_premium=False, cursor=cursor)
+
+@allure.feature("Database User")
+@allure.story("Create User")
+def test_too_long_email(cursor):
+    with pytest.raises(ValueError):
+        register_user("username", "password", "e"*244 + "@example.com", is_premium=False, cursor=cursor)
+
+@allure.feature("Database User")
+@allure.story("Create User")
+def test_no_email(cursor):
+    with pytest.raises(ValueError):
+        register_user("username", "password", "", is_premium=False, cursor=cursor)
 
 @allure.feature("Database User")
 @allure.story("Create User")

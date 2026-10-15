@@ -5,6 +5,7 @@ from src.application import (
     grant_ppv_access
 )
 import allure
+import pytest
 
 
 @allure.feature("Database Access")
@@ -46,4 +47,12 @@ def test_process_watch_request(cursor):
     assert process_watch_request(premium_user_id, movie_id, cursor = cursor) == True, "Premium user should have access to premium movie"
     assert process_watch_request(non_premium_user_id, movie_id, cursor = cursor) == True, "User with ppv access should have access to premium movie"
 
-    
+@allure.feature("Database Access")
+@allure.story("Access Control")
+def test_grant_ppv_access_with_invalid_user_id_or_movie_id(cursor):
+
+    movie_id = create_movie("2023-01-01", True, "en", "Premium Movie", "A premium movie description", cursor=cursor)
+    non_premium_user_id = register_user("username", "password123", "mail@mail.com", is_premium=False, cursor=cursor)
+
+    assert grant_ppv_access(None, movie_id, cursor=cursor) == (False, "Invalid user ID or movie ID"),  "Should return False for invalid user ID"
+    assert grant_ppv_access(non_premium_user_id, None, cursor=cursor) == (False, "Invalid user ID or movie ID"),  "Should return False for invalid movie ID"
