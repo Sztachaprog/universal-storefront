@@ -1,205 +1,106 @@
-# Universal Storefront - QA Automation Framework
-A portfolio project built to demonstrate multi-layer test automation across database, business logic, and UI levels. The project simulates a VOD streaming platform with user management, a movie catalog, and a premium subscription system
+# Universal Storefront — Test Automation Framework
 
-##  What This Project Tests
-The framework covers three layers of testing:
+[![Tests](https://github.com/Sztachaprog/universal-storefront/actions/workflows/tests.yml/badge.svg)](https://github.com/Sztachaprog/universal-storefront/actions/workflows/tests.yml)
+![Python](https://img.shields.io/badge/Python-3.14-blue)
+![Playwright](https://img.shields.io/badge/Playwright-E2E-green)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)
 
-- Integration tests — Python functions talking directly to PostgreSQL. Verify that data is correctly stored, updated, and deleted.
-- E2E tests — Playwright opens a real browser, fills forms, clicks buttons, and checks what the user sees. Also verifies the database state after UI actions.
-- CI/CD — GitHub Actions runs all tests automatically on every push to main.
-- API tests — Requests library hits REST endpoints directly. Verifies status codes, JSON structure, and JWT authentication.
+**71 automated tests across three layers (database integration, REST API with JWT, E2E UI), running in GitHub Actions on every push and pull request against an ephemeral PostgreSQL container, with an Allure report published as a build artifact.**
 
-##  Tech Stack
-- **Python 3.14**: Main language
-- **Psycopg2**: Python driver for PostgreSQL
-- **bcrypt**: Password hashing
-- **PyJWT**: JWT token generation and validation
-- **Requests**: HTTP client for API tests
-- **Playwright**: Browser automation for E2E tests
-- **Docker & Docker Compose**: Runs PostgreSQL in a container
-- **Poetry**: Package manager
-- **PostgreSQL**: Relational database
-- **Flask**: Web framework
-- **Pytest**: Test runner and fixture management
-- **allure**: Pytest reporting with screenshots on failure
-- **GitHub Actions**: CI/CD pipeline
-  
-##  Project Structure
+The system under test is a Flask + PostgreSQL VOD platform I built for this purpose: user accounts, a movie catalog, and three access tiers (free, premium, pay-per-view).
 
-```text
-universal-storefront/
-├── .github/
-│   └── workflows/
-│       └── tests.yml            # GitHub Actions CI/CD pipeline
-├── src/
-│   ├── database/
-│   │   ├── sql/
-│   │   │   └── schema.sql       # Database schema (tables, constraints)
-│   │   ├── database.py          # DB connection management
-│   │   └── db_utils.py          # Helper utilities
-│   ├── static/
-│   │   └── style.css            # Frontend styles
-│   ├── templates/
-│   │   ├── dashboard.html       # dashboard page
-│   │   ├── login.html           # Login page
-│   │   ├── movie_detail.html    # movie_detail page
-│   │   ├── movie_not_found.html # movie_not_found page
-│   │   ├── movies.html          # movies page
-│   │   ├── register.html        # Register page
-│   │   └── watch_html           # watch page
-│   ├── app.py                   # Flask application (routes, session management)
-│   └── application.py           # Business logic (users, movies, access control)
-├── tests/
-│   ├── conftest.py              # Shared fixture: database schema setup
-│   ├── api/
-│   │   ├── conftest.py          # DB fixture: connection + TRUNCATE after each test
-│   │   ├── test_movie_api.py    # API tests: CRUD + JWT auth scenarios
-│   │   └── test_users_api.py    # API tests: CRUD + JWT auth scenarios
-│   ├── database/
-│   │   ├── conftest.py          # DB fixture: connection + rollback after each test
-│   │   ├── test_user.py         # Integration tests: user registration, authentication, validation and profile management
-│   │   ├── test_movie.py        # Integration tests: movie catalog
-│   │   └── test_access.py       # Integration tests: PPV access + watch request logic
-│   └── e2e/
-│       ├── conftest.py          # E2E fixture: connection + TRUNCATE after each test
-│       ├── pages/
-│       │   ├── login_page.py    # Page Object: login page
-│       │   ├── register_page.py # Page Object: register page
-│       │   ├── movies_page.py   # Page Object: movies page
-│       │   └── dashboard_page.py # Page Object: dashboard
-│       ├── test_auth.py         # E2E: authentication flow
-│       ├── test_login.py        # E2E: login flow
-│       ├── test_movies.py       # E2E: movies flow
-│       ├── test_register.py     # E2E: user registration flow
-│       └── test_upgrade.py      # E2E: upgrade to premium + DB verification
-├── docker-compose.yml
-├── pyproject.toml
-└── README.md
+---
+
+## Highlights
+
+| | |
+|---|---|
+| **3-layer test pyramid** | 30 integration · 18 API · 23 E2E tests, each layer with its own isolation strategy |
+| **Database as test oracle** | UI and API tests assert the resulting database state, not only what the screen or response shows |
+| **Auth & access control** | JWT: expired, invalid and missing tokens; 401 vs 403 semantics; premium and PPV access enforced server-side |
+| **Negative testing** | Tests on non-existent records exposed silent failures; fixed with `rowcount` validation |
+| **CI** | GitHub Actions with a PostgreSQL service container, health checks, Flask readiness probe, secrets via GitHub Secrets |
+| **Reporting** | Allure with full-page screenshots on E2E failure, uploaded as a CI artifact |
+
+## Test architecture
+
+| Layer | Tool | What it verifies | Isolation |
+|---|---|---|---|
+| Integration (`tests/database`) | pytest + psycopg2 | Business logic against real PostgreSQL: constraints, CRUD, access rules | Transaction rollback after each test |
+| API (`tests/api`) | pytest + Requests | Status codes, JSON contracts, JWT auth, authorization per tier | `TRUNCATE` after each test |
+| E2E (`tests/e2e`) | Playwright + Page Object Model | User flows in a real browser + DB state after UI actions | `TRUNCATE` after each test |
+
+**Why rollback for integration but TRUNCATE for API/E2E?** Integration tests share the test's DB connection, so a rollback undoes everything. API and E2E tests go through the running Flask app, which commits on its own connection, so rollback in the test can't reach that data.
+
+## CI pipeline
+
+On every push and pull request to `main`:
+
+1. PostgreSQL 16 starts as a service container (health-checked with `pg_isready`)
+2. Integration tests run
+3. Flask starts in the background; the job waits until `/login` responds (30 s timeout, logs printed on failure)
+4. API and E2E (headless Chromium) tests run, each independent of the other's result
+5. Allure report is generated and uploaded as an artifact, even when tests fail
+
+`SECRET_KEY` is injected from GitHub Secrets; locally it is read from `.env` (not committed).
+
+## Run locally
+
+Requirements: Docker, Python 3.14, Poetry (optional: Allure CLI)
+
+```bash
+git clone https://github.com/Sztachaprog/universal-storefront.git
+cd universal-storefront
+poetry install
+poetry run playwright install chromium
+
+echo "SECRET_KEY=change-me" > .env
+docker-compose up -d                                   # PostgreSQL on :5433, pgAdmin on :8080
+poetry run python -m flask --app src.app run --port 5000
+
+poetry run pytest tests/database                       # no Flask needed
+poetry run pytest tests/api tests/e2e                  # Flask must be running
+poetry run pytest tests --alluredir=allure-results && allure serve allure-results
 ```
 
+> Credentials in `docker-compose.yml` are defaults for the local development database only.
 
-###  Database Schema
+## Tech stack
 
-**Users**
+**Testing:** pytest, Playwright, Requests, Allure  
+**Application:** Python, Flask, PostgreSQL, psycopg2, PyJWT, bcrypt  
+**Infrastructure:** GitHub Actions, Docker Compose, Poetry
 
-| Column | Type | Constraints | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | SERIAL | PRIMARY KEY | Unique user identifier |
-| `username` | VARCHAR(50) | NOT NULL, UNIQUE | User's display name |
-| `password_hash` | TEXT | NOT NULL | Hashed user password |
-| `email` | VARCHAR(100) | NOT NULL, UNIQUE | User's email address |
-| `is_premium` | BOOLEAN | DEFAULT FALSE | Premium subscription status |
-| `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Account creation timestamp |
-| `updated_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Last profile update timestamp |
+<details>
+<summary>Project structure</summary>
 
-**Movies**
+```text
+src/
+  app.py               Flask routes, JWT decorator, API endpoints
+  application.py       Business logic: users, movies, access control
+  database/            Connection handling, schema.sql
+tests/
+  database/            Integration tests
+  api/                 API tests
+  e2e/                 E2E tests + pages/ (Page Objects)
+.github/workflows/     CI pipeline
+```
+</details>
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | SERIAL | PRIMARY KEY | Unique movie identifier |
-| `release_date` | DATE | | Movie release date |
-| `is_premium_only` | BOOLEAN | DEFAULT FALSE | Whether movie requires premium subscription |
+<details>
+<summary>Database schema</summary>
 
-**Movie Translations**
+- **users**: id, username (unique), email (unique), password_hash, is_premium, timestamps
+- **movies**: id, release_date, is_premium_only
+- **movie_translations**: movie_id → movies, language_code, title, description; unique (movie_id, language_code)
+- **user_access** (pay-per-view): user_id → users, movie_id → movies, expires_at (default +30 days); unique (user_id, movie_id)
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | SERIAL | PRIMARY KEY | Unique translation identifier |
-| `movie_id` | INTEGER | NOT NULL, FK → movies(id) ON DELETE CASCADE | Reference to parent movie |
-| `language_code` | VARCHAR(2) | NOT NULL | ISO 639-1 language code (e.g. `pl`, `en`) |
-| `title` | VARCHAR(200) | NOT NULL | Localized movie title |
-| `description` | TEXT | | Localized movie description |
-| `movie_id + language_code` | | UNIQUE | One translation per language per movie |
+All foreign keys use `ON DELETE CASCADE`.
+</details>
 
-**User Access**
+## Roadmap
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | SERIAL | PRIMARY KEY | Unique access record identifier |
-| `user_id` | INTEGER | NOT NULL, FK → users(id) ON DELETE CASCADE | Reference to user |
-| `movie_id` | INTEGER | NOT NULL, FK → movies(id) ON DELETE CASCADE | Reference to movie |
-| `created_at` | TIMESTAMP | DEFAULT NOW() | Access grant timestamp |
-| `expires_at` | TIMESTAMP | DEFAULT NOW() + 30 days | Access expiry timestamp |
-| `user_id + movie_id` | | UNIQUE | One access record per user per movie |
-
-
-##  Quick Start
-
-### 1. Requirements
-- Docker Desktop
-- Python 3.14
-- Poetry
-- Allure 
-
-### 2. Setup
-#### Clone the repository
-- git clone https://github.com/Sztachaprog/universal-storefront.git
-- cd universal-storefront
-
-#### Install dependencies
-- poetry install
-
-#### Install Playwright browsers
-- poetry run playwright install chromium
-
-#### Install Allure CLI (for test reports)
-   Windows (scoop):
-   - scoop install allure
-  
-  macOS (brew):
-   - brew install allure
-
-#### Start PostgreSQL
-- docker-compose up -d
-
-#### Run the Application
-- poetry run python -m flask --app src.app run --port 5000
-
-- Then open http://localhost:5000 in your browser
-
-### 3. Run Tests
-#### All tests
-- poetry run pytest tests
-
-#### Integration tests only
-- poetry run pytest tests/database
-
-#### E2E tests only (Flask must be running)
-- poetry run pytest tests/e2e
-
-#### E2E with visible browser (Flask must be running)
-- poetry run pytest tests/e2e --headed
-
-#### API tests only (Flask must be running)
-- poetry run pytest tests/api
-
-### 4. Test Reports (Allure)
-#### Generate results while running tests:
-- poetry run pytest tests --alluredir=allure-results
-
-#### Open the report:
-- allure serve allure-results
-
-
-## CI/CD
-### GitHub Actions runs on every push to main:
-
-1. Starts a PostgreSQL container (port 5433)
-2. Installs Python 3.14 and Poetry
-3. Installs dependencies and Playwright browsers
-4. Runs integration tests
-5. Starts Flask in the background
-6. Runs API tests
-7. Runs E2E tests with headless Chromium
-
-
-## Status
-
-This project is actively developed. Planned additions:
-- Add /movies page
-- Extended API, E2E tests
-- Add mobile tests
-
-
-
-
+- [ ] Containerize the Flask app (Dockerfile) and run the full stack with Docker Compose
+- [ ] Publish the Allure report to GitHub Pages
+- [ ] Static analysis (SAST) step in CI
+- [ ] Parallel test execution
