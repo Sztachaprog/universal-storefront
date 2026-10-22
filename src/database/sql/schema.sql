@@ -1,6 +1,6 @@
     CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
-        username VARCHAR(50) NOT NULL UNIQUE,
+        username VARCHAR(30) NOT NULL UNIQUE,
         password_hash TEXT NOT NULL,
         email VARCHAR(255) NOT NULL UNIQUE,
         is_premium BOOLEAN DEFAULT FALSE,
