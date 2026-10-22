@@ -12,10 +12,9 @@ from src.application import (
 import pytest
 import allure
 
-
 #Create
 @allure.feature("Database User")
-@allure.story("Create User")
+@allure.story("Create User - happy path")
 def test_create_user(cursor):
     register_user("username", "password", "user@example.com", is_premium=True, cursor=cursor)
     cursor.execute("SELECT username, password_hash, email, is_premium FROM users WHERE username = 'username';")
@@ -25,76 +24,131 @@ def test_create_user(cursor):
     assert user[0] == "username", f"Where looking for 'username', found '{user[0]}'"
     assert user[1] != "password", f"Different password than inputed '{user[1]}'"
     assert user[2] == "user@example.com", f"Where looking for 'user@example.com', found '{user[2]}'"
-    assert user[3] == True, f"Where looking for is_premium True, found {user[3]}"
+    assert user[3], f"Where looking for is_premium True, found {user[3]}"
 
 @allure.feature("Database User")
-@allure.story("Create User")
+@allure.story("Create User - happy path")
+def test_max_valid_length_email(cursor):
+    email = "e"*243 + "@example.com"
+    register_user("username", "password", email, is_premium=True, cursor=cursor)
+    cursor.execute("SELECT email FROM users WHERE username = 'username';")
+    user_email = cursor.fetchone()
+
+    assert user_email[0] == email, "User should be able to contain 255 chars in email"
+
+@allure.feature("Database User")
+@allure.story("Create User - happy path")
+def test_max_valid_length_username(cursor):
+    username = "x"*30 
+    register_user(username, "password", "user@example.com",  is_premium=True, cursor=cursor)
+    cursor.execute("SELECT username FROM users WHERE email = 'user@example.com';")
+    user_username = cursor.fetchone()
+
+    assert user_username[0] == username, "User should be able to contain 30 chars in username"
+
+@allure.feature("Database User")
+@allure.story("Create User - happy path")
+def test_min_valid_length_username(cursor):
+    register_user("xxxxxx", "password", "user@example.com",  is_premium=True, cursor=cursor)
+    cursor.execute("SELECT username FROM users WHERE email = 'user@example.com';")
+    user_username = cursor.fetchone()
+
+    assert user_username[0] == "xxxxxx", "User should be able to contain at least 6 chars in username"
+
+@allure.feature("Database User")
+@allure.story("Create User - happy path")
+def test_max_valid_length_password(cursor):
+    password = "X!" + "x"*70
+    register_user("username", password, "user@example.com",  is_premium=True, cursor=cursor)
+    cursor.execute("SELECT username FROM users WHERE username = 'username';")
+    user = cursor.fetchone()
+
+    assert user, "User should be able to contain 72 chars in password"
+
+@allure.feature("Database User")
+@allure.story("Create User - happy path")
+def test_min_valid_length_password(cursor):
+    register_user("username", "password", "user@example.com",  is_premium=True, cursor=cursor)
+    cursor.execute("SELECT username FROM users WHERE username = 'username';")
+    user = cursor.fetchone()
+
+    assert user, "User should be able to contain at least 8 chars in password"
+
+@allure.feature("Database User")
+@allure.story("Create User - validation")
 def test_too_short_password(cursor):
-    with pytest.raises(ValueError):
-        register_user("username", "haslo", "bartek@example.com", is_premium=False, cursor=cursor) 
+    with pytest.raises(ValueError, match = "Password is too short"):
+        register_user("username", "passwor", "bartek@example.com", is_premium=False, cursor=cursor) 
 
 @allure.feature("Database User")
-@allure.story("Create User")
+@allure.story("Create User - validation")
 def test_no_username(cursor):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match = "Username is required"):
         register_user("", "password", "bartek@example.com", is_premium=False, cursor=cursor)
 
 @allure.feature("Database User")
-@allure.story("Create User")
+@allure.story("Create User - validation")
 def test_too_short_username(cursor):
-    with pytest.raises(ValueError):
-        register_user("user", "password", "bartek@example.com", is_premium=False, cursor=cursor) 
+    with pytest.raises(ValueError, match = "Username is too short"):
+        register_user("user1", "password", "bartek@example.com", is_premium=False, cursor=cursor) 
 
 @allure.feature("Database User")
-@allure.story("Create User")
+@allure.story("Create User - validation")
 def test_too_long_username(cursor):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match = "Username is too long"):
         register_user("u"*31, "password", "user@example.com", is_premium=False, cursor=cursor)
 
 @allure.feature("Database User")
-@allure.story("Create User")
+@allure.story("Create User - validation")
 def test_too_long_password(cursor):
-    with pytest.raises(ValueError):
-        register_user("username", "p"*75, "user@example.com", is_premium=False, cursor=cursor)
+    with pytest.raises(ValueError, match = "Password is too long"):
+        register_user("username", "p"*73, "user@example.com", is_premium=False, cursor=cursor)
 
 @allure.feature("Database User")
-@allure.story("Create User")
+@allure.story("Create User - validation")
+def test_too_long_password_multibyte(cursor):
+    password = "ą" + "p"*71
+    with pytest.raises(ValueError, match = "Password is too long"):
+        register_user("username", password, "user@example.com", is_premium=False, cursor=cursor)
+
+@allure.feature("Database User")
+@allure.story("Create User - validation")
 def test_no_password(cursor):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match = "Password is required"):
         register_user("username", "", "user@example.com", is_premium=False, cursor=cursor)
 
 @allure.feature("Database User")
-@allure.story("Create User")
+@allure.story("Create User - validation")
 def test_too_long_email(cursor):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match = "Email is too long"):
         register_user("username", "password", "e"*244 + "@example.com", is_premium=False, cursor=cursor)
 
 @allure.feature("Database User")
-@allure.story("Create User")
+@allure.story("Create User - validation")
 def test_no_email(cursor):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match = "Email is required"):
         register_user("username", "password", "", is_premium=False, cursor=cursor)
 
 @allure.feature("Database User")
-@allure.story("Create User")
+@allure.story("Create User - validation")
 def test_duplicate_username(cursor):
     register_user("username1", "password", "user1@example.com", cursor = cursor)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match = "Username already exists"):
         register_user("username1", "password", "user2@example.com", is_premium=True, cursor = cursor)
 
 @allure.feature("Database User")
-@allure.story("Create User")
+@allure.story("Create User - validation")
 def test_duplicate_email(cursor):
     register_user("username1", "password", "user1@example.com", cursor = cursor)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match = "Email already exists"):
         register_user("username2", "password", "user1@example.com", is_premium=True, cursor = cursor)
         
 @allure.feature("Database User")
-@allure.story("Create User")
+@allure.story("Create User - validation")
 def test_special_chars(cursor):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match = "Forbidden characters in username"):
         register_user("miha!!.", "password", "user1@example.com", cursor = cursor)
 
 # Read
@@ -107,7 +161,7 @@ def test_get_user_by_name(cursor):
     assert user is not None, "User not found in database"
     assert user[1] == "username", f"Expected username 'username', got '{user[1]}'"
     assert user[2] == "mail@mail.com", f"Expected email 'mail@mail.com', got '{user[2]}'"
-    assert user[3] == False, f"Expected is_premium False, got {user[3]}"
+    assert user[3] is False, f"Expected is_premium False, got {user[3]}"
 
 @allure.feature("Database User")
 @allure.story("Get User")
@@ -118,7 +172,7 @@ def test_get_user_by_mail(cursor):
     assert user is not None, "User not found in database"
     assert user[1] == "username", f"Expected username 'username', got '{user[1]}'"
     assert user[2] == "mail@mail.com", f"Expected email 'mail@mail.com', got '{user[2]}'"
-    assert user[3] == False, f"Expected is_premium False, got {user[3]}"
+    assert user[3] is False, f"Expected is_premium False, got {user[3]}"
 
 @allure.feature("Database User")
 @allure.story("Get User")
@@ -130,7 +184,7 @@ def test_get_user_by_id(cursor):
     assert user[0] == registered, f"Expected user ID {registered}, got '{user[0]}'"
     assert user[1] == "username", f"Expected username 'username', got '{user[1]}'"
     assert user[2] == "mail@mail.com", f"Expected email 'mail@mail.com', got '{user[2]}'"
-    assert user[3] == False, f"Expected is_premium False, got {user[3]}"
+    assert user[3] is False, f"Expected is_premium False, got {user[3]}"
     
 # Delete
 @allure.feature("Database User")
@@ -170,4 +224,4 @@ def test_upgrade_user_to_premium(cursor):
     upgrade_user_to_premium(non_premium_user, cursor = cursor)
     premium_user = get_user_by_id(non_premium_user, cursor = cursor)
 
-    assert premium_user[3] == True, "User not upgraded to premium"
+    assert premium_user[3], "User not upgraded to premium"

@@ -25,10 +25,13 @@ def register_user(username, password, email, is_premium=False, cursor = None):
         if len(email) > 255:
                 raise ValueError("Email is too long")
         
+        if password is None or password.strip() == "":
+                raise ValueError("Password is required")
+        
         if len(password) < 8:
                 raise ValueError("Password is too short")
         
-        if len(password) > 74:
+        if (len(password.encode('utf-8')) > 72):
                 raise ValueError("Password is too long")
         
         user_username = get_user_by_name(username, cursor=cursor)
